@@ -1,0 +1,299 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Histórico de propostas{% endblock %}
+
+{% block header %}
+<h1>Histórico de propostas</h1>
+<p class="text-muted">Visualize propostas aprovadas, rejeitadas e arquivadas.</p>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/proposta.css' %}">
+
+<div class="propostas-layout">
+  <!-- Filtros -->
+  <div class="card filtros-card">
+    <form method="get" class="filtros-form">
+      <div class="filtros-grid">
+        <div class="form-group">
+          <label for="id_busca">Buscar</label>
+          <input type="text" id="id_busca" name="q" class="form-control"
+                 placeholder="Nº, título, cliente..."
+                 value="{{ busca }}">
+        </div>
+        <div class="form-group">
+          <label for="id_data_ini">De</label>
+          <input type="date" id="id_data_ini" name="data_ini" class="form-control"
+                 value="{{ data_ini }}">
+        </div>
+        <div class="form-group">
+          <label for="id_data_fim">Até</label>
+          <input type="date" id="id_data_fim" name="data_fim" class="form-control"
+                 value="{{ data_fim }}">
+        </div>
+        <div class="form-group">
+          <label for="id_status_hist">Status</label>
+          <select id="id_status_hist" name="status_hist" class="form-control">
+            <option value="aprovado"  {% if status_hist == "aprovado" %}selected{% endif %}>Aprovadas</option>
+            <option value="rejeitado" {% if status_hist == "rejeitado" %}selected{% endif %}>Rejeitadas</option>
+            <option value="arquivado" {% if status_hist == "arquivado" %}selected{% endif %}>Arquivadas</option>
+          </select>
+        </div>
+        <div class="form-group filtros-actions">
+          <label>&nbsp;</label>
+          <div class="filtros-actions-inline">
+            <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+            <a href="{% url 'propostas:propostas_list' %}" class="btn btn-outline">
+              Voltar ao funil
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabela -->
+  <div class="card historico-card">
+    {% if historico %}
+    <table class="table historico-table">
+      <thead>
+        <tr>
+          <th>Nº</th>
+          <th>Título</th>
+          <th>Cliente</th>
+          <th>Data</th>
+          <th>Total</th>
+          <th>Tipo</th>
+          <th>Status</th>
+          <th style="width: 180px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in historico %}
+        <tr>
+          <td>{{ p.numero }}</td>
+          <td>{{ p.titulo_servico|default:"[Sem título]" }}</td>
+          <td>{{ p.cliente|default:"[Sem cliente]" }}</td>
+          <td>{{ p.created_at|date:"d/m/Y" }}</td>
+          <td>
+            {% if p.total %}
+              R$ {{ p.total|floatformat:2 }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            <div class="tipo-cell">
+              {% if p.usar_modelo_sistema %}
+                <span class="tag-entrega tag-entrega-pdf">PDF</span>
+                {% if p.public_token %}
+                  <span class="tag-entrega tag-entrega-online">Online</span>
+                {% endif %}
+              {% else %}
+                {% if p.modelo_proprio_arquivo %}
+                  <span class="tag-entrega tag-entrega-pdf">PDF modelo próprio</span>
+                {% else %}
+                  <span class="tag-entrega tag-entrega-neutro">Sem arquivo</span>
+                {% endif %}
+              {% endif %}
+            </div>
+          </td>
+          <td>
+            <div class="status-cell">
+              {% if p.status == "aprovado" %}
+                <span class="badge badge-success">{{ p.get_status_display }}</span>
+              {% elif p.status == "rejeitado" %}
+                <span class="badge badge-danger">{{ p.get_status_display }}</span>
+              {% elif p.status == "arquivado" %}
+                <span class="badge badge-secondary">{{ p.get_status_display }}</span>
+              {% else %}
+                {{ p.get_status_display }}
+              {% endif %}
+
+              {% if p.revisao_solicitada_em %}
+                <span class="badge badge-revisao">Revisão solicitada</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="right">
+            <div class="historico-actions">
+              <a href="{% url 'propostas:proposta_edit' pk=p.pk %}"
+                 class="btn btn-outline btn-small">
+                abrir
+              </a>
+
+              {# VISUALIZAÇÃO: segue a mesma lógica dos cards #}
+              {% if p.usar_modelo_sistema %}
+                <a href="{% url 'propostas:proposta_public_pdf' pk=p.pk %}"
+                   target="_blank"
+                   class="btn btn-outline btn-small">
+                  PDF
+                </a>
+                {% if p.public_token %}
+                  <a href="{% url 'propostas:proposta_public_view' token=p.public_token %}"
+                     target="_blank"
+                     class="btn btn-outline btn-small">
+                    online
+                  </a>
+                {% endif %}
+              {% else %}
+                {% if p.modelo_proprio_arquivo %}
+                  <a href="{{ p.modelo_proprio_arquivo.url }}"
+                     target="_blank"
+                     class="btn btn-outline btn-small">
+                    PDF próprio
+                  </a>
+                {% endif %}
+              {% endif %}
+
+              <form method="post"
+                    action="{% url 'propostas:proposta_delete' pk=p.pk %}"
+                    style="display:inline;"
+                    onsubmit="return confirm('Tem certeza que deseja excluir esta proposta?');">
+                {% csrf_token %}
+                <button type="submit"
+                        class="btn btn-outline btn-small btn-danger-soft">
+                  excluir
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="text-muted">Nenhuma proposta encontrada para os filtros selecionados.</p>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.propostas-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.propostas-layout .card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+/* Filtros */
+.filtros-form .filtros-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 12px;
+}
+.filtros-actions {
+  display: flex;
+  align-items: flex-end;
+}
+.filtros-actions-inline {
+  display: flex;
+  gap: 8px;
+}
+
+/* Tabela */
+.historico-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.historico-table th,
+.historico-table td {
+  padding: 8px 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.historico-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  color: #6b7280;
+}
+.historico-table td.right {
+  text-align: right;
+}
+
+/* Tipo de entrega */
+.tipo-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.tag-entrega {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.tag-entrega-pdf {
+  background: #e5e7eb;
+  color: #374151;
+}
+.tag-entrega-online {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.tag-entrega-neutro {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+/* Status */
+.status-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+.badge-success { background: #ecfdf3; color: #16a34a; }
+.badge-danger { background: #fef2f2; color: #dc2626; }
+.badge-secondary { background: #e5e7eb; color: #374151; }
+.badge-revisao {
+  background: #f973161a;
+  color: #ea580c;
+}
+
+/* Ações histórico */
+.historico-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-danger-soft {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+.btn-danger-soft:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+@media (max-width: 1200px) {
+  .propostas-layout {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+}
+@media (max-width: 900px) {
+  .filtros-form .filtros-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}

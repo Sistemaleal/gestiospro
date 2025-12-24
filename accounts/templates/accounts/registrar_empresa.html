@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestiospro - Cadastro de Empresa</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+
+<body class="login-body">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <img src="{% static 'img/logo-gestiospro.png' %}" alt="Gestiospro" class="login-logo-img">
+                </div>
+                <h1>Cadastrar empresa</h1>
+                <p class="login-subtitle">
+                    Crie a conta da sua empresa para começar a usar o Gestiospro.
+                </p>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="login-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_nome_fantasia">Nome Cliente / Nome fantasia *</label>
+                    <input type="text" id="id_nome_fantasia" name="nome_fantasia" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_telefone">Telefone</label>
+                    <input type="text" id="id_telefone" name="telefone" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email">E-mail</label>
+                    <input type="email" id="id_email" name="email" class="form-control">
+                </div>
+
+                <hr>
+
+                <div class="form-group">
+                    <label for="id_username">Nome de usuário *</label>
+                    <input type="text" id="id_username" name="username" class="form-control" required>
+                </div>
+
+                <div class="form-group password-group">
+                    <label for="id_senha">Senha *</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="id_senha" name="senha" class="form-control" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('id_senha', this)">
+                            Mostrar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group password-group">
+                    <label for="id_senha2">Confirmar senha *</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="id_senha2" name="senha2" class="form-control" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('id_senha2', this)">
+                            Mostrar
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Criar empresa e usuário</button>
+            </form>
+
+            <div class="login-footer">
+                <span>Já tem empresa cadastrada?</span>
+                <a href="{% url 'accounts:login' %}">Voltar para o login</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

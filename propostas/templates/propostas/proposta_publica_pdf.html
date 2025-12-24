@@ -1,0 +1,190 @@
+{% load static %}
+{% load propostas_extras %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Proposta {{ proposta.numero }} - {{ empresa.nome_fantasia|default:empresa.razao_social }}</title>
+</head>
+<body class="proposta-publica-pdf">
+
+  <!-- Cabeçalho com logo à esquerda e dados da empresa ao lado -->
+  <header class="header-pdf">
+    <div class="header-esquerda">
+      {% if empresa.logo %}
+      <img src="{{ empresa.logo.url }}"
+           alt="Logo {{ empresa.nome_fantasia|default:empresa.razao_social }}"
+           class="empresa-logo">
+      {% endif %}
+
+      <div class="empresa-dados">
+        <p class="empresa-nome">
+          {{ empresa.nome_fantasia|default:empresa.razao_social }}
+        </p>
+        {% if empresa.cnpj %}
+        <p>CNPJ: {{ empresa.cnpj }}</p>
+        {% endif %}
+        {% if empresa.telefone %}
+        <p>Tel.: {{ empresa.telefone }}</p>
+        {% endif %}
+        {% if empresa.email %}
+        <p>E-mail: {{ empresa.email }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="proposta-info">
+      <div class="proposta-numero">Proposta Nº {{ proposta.numero }}</div>
+      <div>
+        Data:
+        {% if proposta.data_servico %}
+          {{ proposta.data_servico|date:"d/m/Y" }}
+        {% else %}-{% endif %}
+      </div>
+      {% if proposta.validade %}
+      <div>
+        Validade: {{ proposta.validade|date:"d/m/Y" }}
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Corpo da proposta -->
+  <div class="conteudo-pdf">
+
+    <!-- Cliente / título -->
+    <section class="proposta-publica-section">
+      <h2>{{ proposta.titulo_servico }}</h2>
+
+      <p>
+        <strong>Proposta Nº:</strong> {{ proposta.numero }}
+      </p>
+
+      <p><strong>Cliente:</strong> {{ proposta.cliente }}</p>
+    </section>
+
+    <!-- 1. Objetivo -->
+    <section class="proposta-publica-section">
+      <h3>1. Objetivo</h3>
+      <p>{{ proposta.objetivo_texto|default:"[Objetivo não informado]" }}</p>
+    </section>
+
+    <!-- 2. Escopo do projeto -->
+    <section class="proposta-publica-section">
+      <h3>2. Escopo do projeto</h3>
+      <p>{{ proposta.escopo_texto|default:"[Escopo não informado]" }}</p>
+    </section>
+
+    <!-- 3. Exclusões -->
+    <section class="proposta-publica-section">
+      <h3>3. Exclusões</h3>
+      <p>{{ proposta.exclusos_texto|default:"[Exclusões não informadas]" }}</p>
+    </section>
+
+    <!-- 4. Investimentos -->
+    <section class="proposta-publica-section">
+      <h3>4. Investimentos e forma de pagamento</h3>
+
+      <h4>4.1. Serviços e valores</h4>
+
+      {% if not proposta.exibir_apenas_total %}
+      <table class="proposta-publica-tabela">
+        <thead>
+          <tr>
+            <th>Serviço</th>
+            <th class="right">Valor (R$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if itens %}
+            {% for it in itens %}
+            <tr>
+              <td>{{ it.nome }}</td>
+              <td class="right">
+                {% if it.valor %}
+                  R$ {{ it.valor|br_currency }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="2" class="center">Nenhum serviço cadastrado.</td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="right"><strong>Subtotal</strong></td>
+            <td class="right">R$ {{ proposta.subtotal|br_currency }}</td>
+          </tr>
+          {% if proposta.desconto_valor and proposta.desconto_valor > 0 %}
+          <tr>
+            <td class="right">Desconto</td>
+            <td class="right">- R$ {{ proposta.desconto_valor|br_currency }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td class="right"><strong>Total</strong></td>
+            <td class="right"><strong>R$ {{ proposta.total|br_currency }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+      {% else %}
+      <p>
+        Pela realização dos serviços descritos, o investimento total é de
+        <strong>R$ {{ proposta.total|br_currency }}</strong>.
+      </p>
+      {% endif %}
+
+      <h4>4.2. Texto de investimentos e forma de pagamento</h4>
+      <p>{{ proposta.investimentos_texto|default:"[Texto de investimentos não informado]" }}</p>
+
+      {# 4.3. Parcelas removido conforme combinado #}
+
+    </section>
+
+    <!-- 5. Prazos -->
+    <section class="proposta-publica-section">
+      <h3>5. Prazos</h3>
+
+      <h4>5.1. Prazo para início dos serviços</h4>
+      <p>{{ proposta.prazo_inicio_texto|default:"[Prazo para início não informado]" }}</p>
+
+      <h4>5.2. Prazo para entrega dos serviços</h4>
+      <p>{{ proposta.prazo_entrega_texto|default:"[Prazo para entrega não informado]" }}</p>
+    </section>
+
+    <!-- 6. Declarações -->
+    <section class="proposta-publica-section">
+      <h3>6. Declarações</h3>
+      <p>{{ proposta.declaracoes_texto|default:"[Declarações não informadas]" }}</p>
+    </section>
+
+    <!-- 7. Termo de confidencialidade -->
+    <section class="proposta-publica-section">
+      <h3>7. Termo de confidencialidade</h3>
+      <p>{{ proposta.confidencialidade_texto|default:"[Termo de confidencialidade não informado]" }}</p>
+    </section>
+
+    <!-- 8. Agradecimentos / assinatura (sem título visível) -->
+    <section class="proposta-publica-section">
+      <p>{{ proposta.assinatura_texto|default:"[Agradecimentos / assinatura não informados]" }}</p>
+    </section>
+
+    <!-- 9. Bloco de assinatura no PDF -->
+    <section class="assinatura-bloco">
+      <p class="assinatura-linha">
+        Assinatura: _________________________
+      </p>
+      <p class="assinatura-linha">
+        Data da aprovação: ____/____/________
+      </p>
+    </section>
+
+  </div>
+</body>
+</html>

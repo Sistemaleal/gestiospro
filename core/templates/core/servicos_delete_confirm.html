@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% block title %}Remover serviço{% endblock %}
+
+{% block header %}
+<h1>Remover serviço</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <p>
+        Tem certeza que deseja remover o serviço
+        <strong>{{ servico.descricao }}</strong>?
+    </p>
+
+    <form method="post" style="margin-top: 1rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="background: #ef4444; border-color: #ef4444;">
+            Sim, remover
+        </button>
+        <a href="{% url 'core:servicos_list' %}" class="btn btn-outline">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

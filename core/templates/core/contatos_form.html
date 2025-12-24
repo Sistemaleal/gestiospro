@@ -1,0 +1,178 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Contato{% endblock %}
+
+{% block header %}
+<h1>{% if object %}Editar contato{% else %}Novo contato{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <form method="post" class="form-grid" id="contato-form">
+        {% csrf_token %}
+
+        <!-- DADOS PRINCIPAIS -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Dados principais</h2>
+                <p class="form-section-help">
+                    Identificação básica do contato / cliente.
+                </p>
+            </div>
+
+            <div class="form-grid-2">
+                <!-- CPF/CNPJ com botão de busca -->
+                <div class="form-group floating with-addon">
+                    {{ form.cpf_cnpj }}
+                    <label>CPF / CNPJ</label>
+                    <button type="button"
+                            class="input-addon"
+                            id="btn-buscar-cnpj">
+                        Buscar CNPJ
+                    </button>
+                </div>
+
+                <div class="form-group floating required">
+                    {{ form.nome_fantasia }}
+                    <label>Nome do cliente / Nome fantasia*</label>
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.razao_social }}
+                    <label>Razão social</label>
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.telefone }}
+                    <label>Telefone</label>
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.email }}
+                    <label>E‑mail</label>
+                </div>
+
+                <div class="form-group form-inline">
+                    <label>{{ form.ativo.label }}</label>
+                    {{ form.ativo }}
+                </div>
+            </div>
+        </div>
+
+        <!-- RELACIONAMENTOS -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Relacionamento</h2>
+                <p class="form-section-help">
+                    Marque os papéis que este contato exerce para sua empresa.
+                </p>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="checkbox-pill">
+                    {{ form.is_cliente }}
+                    <span>Cliente</span>
+                </label>
+                <label class="checkbox-pill">
+                    {{ form.is_fornecedor }}
+                    <span>Fornecedor</span>
+                </label>
+                <label class="checkbox-pill">
+                    {{ form.is_parceiro }}
+                    <span>Parceiro</span>
+                </label>
+                <label class="checkbox-pill">
+                    {{ form.is_funcionario }}
+                    <span>Funcionário</span>
+                </label>
+                <label class="checkbox-pill">
+                    {{ form.is_responsavel_tecnico }}
+                    <span>Responsável técnico</span>
+                </label>
+                <label class="checkbox-pill">
+                    {{ form.is_outro }}
+                    <span>Outros</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Endereço</h2>
+                <p class="form-section-help">
+                    Dados de endereço do contato.
+                </p>
+            </div>
+
+            <div class="form-grid-3">
+                <!-- CEP com botão de busca -->
+                <div class="form-group floating with-addon">
+                    {{ form.cep }}
+                    <label>CEP</label>
+                    <button type="button"
+                            class="input-addon"
+                            id="btn-buscar-cep">
+                        Buscar CEP
+                    </button>
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.logradouro }}
+                    <label>Endereço</label>
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.numero }}
+                    <label>Número</label>
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.bairro }}
+                    <label>Bairro</label>
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.cidade }}
+                    <label>Cidade</label>
+                </div>
+
+                <!-- UF volta para versão simples, que já funcionava -->
+                <div class="form-group select-group">
+                    <label for="{{ form.uf.id_for_label }}">UF</label>
+                    {{ form.uf }}
+                </div>
+
+                <div class="form-group floating" style="grid-column: 1 / -1;">
+                    {{ form.complemento }}
+                    <label>Complemento</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- OBSERVAÇÕES -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Observações</h2>
+            </div>
+
+            <div class="form-group">
+                {{ form.observacao }}
+            </div>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                Salvar contato
+            </button>
+            <a href="{% url 'core:contatos_list' %}" class="btn btn-outline">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="{% static 'js/contato.js' %}"></script>
+{% endblock %}

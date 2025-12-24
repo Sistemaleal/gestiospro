@@ -1,0 +1,268 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Definições da empresa{% endblock %}
+
+{% block header %}
+<h1>Definições da empresa</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <form method="post" class="form-grid" enctype="multipart/form-data" id="empresa-form">
+        {% csrf_token %}
+
+        <!-- DADOS DA EMPRESA -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Dados da empresa</h2>
+                <p class="form-section-help">
+                    Informações básicas que aparecem no sistema e nos documentos.
+                </p>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group floating">
+                    {{ form.nome_fantasia }}
+                    <label>Nome fantasia</label>
+                    {{ form.nome_fantasia.errors }}
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.razao_social }}
+                    <label>Razão social</label>
+                    {{ form.razao_social.errors }}
+                </div>
+
+                <!-- CNPJ com botão de busca -->
+                <div class="form-group floating with-addon">
+                    {{ form.cnpj }}
+                    <label for="{{ form.cnpj.id_for_label }}">CPF / CNPJ</label>
+                    <button type="button" class="input-addon" id="btn-buscar-cnpj">
+                        Buscar CNPJ
+                    </button>
+                    {{ form.cnpj.errors }}
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.telefone }}
+                    <label>Telefone</label>
+                    {{ form.telefone.errors }}
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.email }}
+                    <label>E‑mail</label>
+                    {{ form.email.errors }}
+                </div>
+
+                <!-- CEP com botão de busca -->
+                <div class="form-group floating with-addon">
+                    {{ form.cep }}
+                    <label>CEP</label>
+                    <button type="button" class="input-addon" id="btn-buscar-cep">
+                        Buscar CEP
+                    </button>
+                    {{ form.cep.errors }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Endereço</h2>
+                <p class="form-section-help">
+                    Endereço da sede da empresa.
+                </p>
+            </div>
+
+            <div class="form-grid-3">
+                <div class="form-group floating">
+                    {{ form.logradouro }}
+                    <label>Logradouro</label>
+                    {{ form.logradouro.errors }}
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.numero }}
+                    <label>Número</label>
+                    {{ form.numero.errors }}
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.bairro }}
+                    <label>Bairro</label>
+                    {{ form.bairro.errors }}
+                </div>
+
+                <div class="form-group floating">
+                    {{ form.cidade }}
+                    <label>Cidade</label>
+                    {{ form.cidade.errors }}
+                </div>
+
+                <div class="form-group select-group">
+                    <label for="{{ form.uf.id_for_label }}">UF</label>
+                    {{ form.uf }}
+                    {{ form.uf.errors }}
+                </div>
+
+                <div class="form-group floating" style="grid-column: 1 / -1;">
+                    {{ form.complemento }}
+                    <label>Complemento</label>
+                    {{ form.complemento.errors }}
+                </div>
+            </div>
+        </div>
+
+        <!-- IDENTIDADE VISUAL -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Identidade visual</h2>
+                <p class="form-section-help">
+                    Logo que será utilizada em relatórios, propostas e no cabeçalho do sistema.
+                </p>
+            </div>
+
+            <div class="form-grid-2">
+                <!-- Esquerda: upload -->
+                <div class="form-group">
+                    <label class="form-label">Logo da empresa</label>
+
+                    {% if form.instance.logo %}
+                        <!-- Opcional: botão ver logo -->
+                        <button type="button"
+                                id="btn-ver-logo"
+                                class="btn btn-small btn-outline"
+                                data-logo-url="{{ form.instance.logo.url }}"
+                                style="margin-bottom: 8px;">
+                            Ver logo
+                        </button>
+                    {% else %}
+                        <p class="text-muted" style="margin-bottom: 6px;">
+                            Nenhuma logo enviada ainda.
+                        </p>
+                    {% endif %}
+
+                    <!-- Apenas o input de arquivo, sem textos padrão -->
+                    <div>
+                        {{ form.logo }}
+                        {{ form.logo.errors }}
+                    </div>
+
+                    <p class="text-muted" style="margin-top: 4px;">
+                        Formatos aceitos: JPG, PNG. Tamanho recomendado: 256x256px.
+                    </p>
+                </div>
+
+                <!-- Direita: pré‑visualização + botão Remover logo (o que você já usa) -->
+                <div class="form-group">
+                    <label class="form-label">Pré‑visualização</label>
+
+                    <div class="logo-preview-wrapper">
+                        <div class="logo-preview-avatar">
+                            <img id="logo-preview"
+                                 src="{% if form.instance.logo %}{{ form.instance.logo.url }}{% endif %}"
+                                 alt="Logo da empresa"
+                                 class="{% if not form.instance.logo %}is-hidden{% endif %}" />
+
+                            {% if not form.instance.logo %}
+                                <span id="logo-placeholder" class="logo-preview-placeholder">
+                                    {% if request.user.empresa.nome_fantasia %}
+                                        {{ request.user.empresa.nome_fantasia|first|upper }}
+                                    {% else %}
+                                        {{ request.user.username|first|upper }}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="logo-preview-actions">
+                            <span class="text-muted logo-preview-text">
+                                Selecione um arquivo para atualizar a logo da empresa.
+                            </span>
+
+                            <button type="button" id="btn-limpar-logo"
+                                    class="btn btn-small btn-outline {% if not form.instance.logo %}is-hidden{% endif %}">
+                                Remover logo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkbox oculto que o backend usa para limpar a logo -->
+            <input type="checkbox" name="logo-clear" id="id_logo_clear" style="display:none;">
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                Salvar
+            </button>
+            <a href="{% url 'core:home' %}" class="btn btn-outline">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script src="{% static 'js/funcoes_gerais.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const inputLogo = document.getElementById("id_logo");
+        const imgPreview = document.getElementById("logo-preview");
+        const placeholder = document.getElementById("logo-placeholder");
+        const btnLimpar = document.getElementById("btn-limpar-logo");
+
+        function mostrarPlaceholder() {
+            if (imgPreview) imgPreview.classList.add("is-hidden");
+            if (placeholder) placeholder.classList.remove("is-hidden");
+            if (btnLimpar) btnLimpar.classList.add("is-hidden");
+        }
+
+        function mostrarImagem() {
+            if (imgPreview) imgPreview.classList.remove("is-hidden");
+            if (placeholder) placeholder.classList.add("is-hidden");
+            if (btnLimpar) btnLimpar.classList.remove("is-hidden");
+        }
+
+        // Atualiza preview ao escolher arquivo
+        if (inputLogo && imgPreview) {
+            inputLogo.addEventListener("change", () => {
+                const file = inputLogo.files && inputLogo.files[0];
+                if (!file) {
+                    imgPreview.src = "";
+                    mostrarPlaceholder();
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imgPreview.src = e.target.result;
+                    mostrarImagem();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Botão "Remover logo" reseta input + preview visual (backend remove via logo-clear)
+        if (btnLimpar && inputLogo && imgPreview) {
+            btnLimpar.addEventListener("click", (e) => {
+                e.preventDefault();
+                // marca checkbox django para limpar no save, se ela existir
+                const clearCheckbox = document.querySelector('input[name="logo-clear"]');
+                if (clearCheckbox) {
+                    clearCheckbox.checked = true;
+                }
+                inputLogo.value = "";
+                imgPreview.src = "";
+                mostrarPlaceholder();
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

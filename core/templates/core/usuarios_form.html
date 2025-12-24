@@ -1,0 +1,154 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Usuário{% endblock %}
+
+{% block header %}
+<h1>{% if object %}Editar usuário{% else %}Novo usuário{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <form method="post" class="form-grid" id="usuario-form">
+        {% csrf_token %}
+
+        <!-- DADOS DO USUÁRIO -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Dados do usuário</h2>
+                <p class="form-section-help">
+                    Defina os dados de acesso e o tipo de usuário.
+                </p>
+            </div>
+
+            <div class="form-grid-2">
+                <!-- Tipo de usuário -->
+                <div class="form-group select-group">
+                    <label for="{{ form.user_type.id_for_label }}">Tipo de usuário</label>
+                    {{ form.user_type }}
+                    <p class="text-muted">
+                        Administrador / Proprietário tem acesso completo aos módulos da empresa.
+                    </p>
+                    {{ form.user_type.errors }}
+                </div>
+
+                <!-- Usuário (login) -->
+                <div class="form-group floating required">
+                    {{ form.username }}
+                    <label for="{{ form.username.id_for_label }}">Usuário (login) *</label>
+                    {{ form.username.errors }}
+                </div>
+
+                <!-- E‑mail -->
+                <div class="form-group floating">
+                    {{ form.email }}
+                    <label for="{{ form.email.id_for_label }}">E‑mail</label>
+                    {{ form.email.errors }}
+                </div>
+
+                <!-- Nome -->
+                <div class="form-group floating">
+                    <input type="text" name="first_name" id="id_first_name" class="form-control"
+                        value="{{ form.instance.first_name }}">
+                    <label for="id_first_name">Nome</label>
+                </div>
+
+                <!-- Sobrenome -->
+                <div class="form-group floating">
+                    <input type="text" name="last_name" id="id_last_name" class="form-control"
+                        value="{{ form.instance.last_name }}">
+                    <label for="id_last_name">Sobrenome</label>
+                </div>
+
+                <!-- Senha com botão Mostrar -->
+                <div class="form-group with-addon">
+                    <label for="{{ form.password.id_for_label }}">
+                        Senha{% if not object %} *{% endif %}
+                    </label>
+                    {{ form.password }}
+                    <button type="button" class="input-addon" id="btn-toggle-password">
+                        Mostrar
+                    </button>
+                    {% if object %}
+                    <small class="text-muted">
+                        Deixe em branco para manter a senha atual.
+                    </small>
+                    {% endif %}
+                    {{ form.password.errors }}
+                </div>
+
+                <!-- Ativo -->
+                <div class="form-group form-inline">
+                    <label>{{ form.is_active.label }}</label>
+                    {{ form.is_active }}
+                    {{ form.is_active.errors }}
+                </div>
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                <div class="alert alert-error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- PERMISSÕES -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Permissões</h2>
+                <p class="form-section-help">
+                    Para usuários <strong>Administrador / Proprietário</strong>, todas as permissões serão ligadas
+                    automaticamente ao salvar. Para usuários padrão, marque apenas o que ele poderá gerenciar.
+                </p>
+            </div>
+
+            <div class="checkbox-group">
+                <label
+                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
+                    {{ form.can_manage_contatos }}
+                    <span>Contatos</span>
+                </label>
+                <label
+                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
+                    {{ form.can_manage_servicos }}
+                    <span>Serviços</span>
+                </label>
+                <label
+                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
+                    {{ form.can_manage_definicoes }}
+                    <span>Definições da empresa</span>
+                </label>
+                <label
+                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
+                    {{ form.can_manage_propostas_definicoes }}
+                    <span>Definições de propostas</span>
+                </label>
+                <label
+                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
+                    {{ form.can_manage_propostas }}
+                    <span>Propostas</span>
+                </label>
+                <label
+                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
+                    {{ form.can_manage_usuarios }}
+                    <span>Usuários</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {% if object %}Salvar alterações{% else %}Salvar usuário{% endif %}
+            </button>
+            <a href="{% url 'core:usuarios_list' %}" class="btn btn-outline">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="{% static 'js/usuarios.js' %}"></script>
+{% endblock %}

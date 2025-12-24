@@ -1,0 +1,106 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Serviço{% endblock %}
+
+{% block header %}
+<h1>{% if object %}Editar serviço{% else %}Novo serviço{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <form method="post" class="form-grid" id="servico-form">
+        {% csrf_token %}
+
+        <!-- Dados do serviço -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Dados do serviço</h2>
+                <p class="form-section-help">
+                    Cadastre os serviços que serão usados nas propostas/projetos.
+                </p>
+            </div>
+
+            <div class="form-group floating required">
+                {{ form.descricao }}
+                <label>Descrição do serviço*</label>
+            </div>
+
+            <div class="form-group floating">
+                {{ form.valor }}
+                <label>Valor padrão (R$)</label>
+                <small class="text-muted">Opcional. Pode ser alterado na proposta.</small>
+            </div>
+        </div>
+
+        <!-- Categoria -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Categoria</h2>
+                <p class="form-section-help">
+                    Organize seus serviços em categorias (ex.: Projetos, Consultoria, Laudos).
+                    Você pode criar uma nova categoria rapidamente no botão ao lado.
+                </p>
+            </div>
+
+            <div class="form-group with-addon">
+                {{ form.categoria }}
+                <button type="button" class="input-addon" id="btn-nova-categoria">
+                    + Nova categoria
+                </button>
+            </div>
+        </div>
+
+        <!-- Entregáveis e status -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h2 class="form-section-title">Entregáveis e status</h2>
+            </div>
+
+            <div class="form-group">
+                {{ form.entregaveis.label_tag }}
+                {{ form.entregaveis }}
+            </div>
+
+            <div class="form-group form-inline">
+                <label>{{ form.ativo.label }}</label>
+                {{ form.ativo }}
+            </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar serviço</button>
+            <a href="{% url 'core:servicos_list' %}" class="btn btn-outline">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de nova categoria -->
+<div class="modal-backdrop" id="modal-categoria-backdrop" style="display:none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2>Nova categoria de serviço</h2>
+        </div>
+        <div class="modal-body">
+            <label class="modal-label" for="nova-categoria-nome">Nome da categoria</label>
+            <input type="text" id="nova-categoria-nome" class="form-control"
+                placeholder="Ex.: Projetos, Consultoria, Laudos" />
+            <p class="modal-help">
+                Essa categoria ficará disponível para todos os serviços desta empresa.
+            </p>
+            <p class="modal-error" id="modal-categoria-erro" style="display:none;"></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="modal-categoria-cancelar">
+                Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" id="modal-categoria-salvar">
+                Salvar categoria
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/servico.js' %}"></script>
+{% endblock %}

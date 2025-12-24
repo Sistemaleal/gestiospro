@@ -1,0 +1,86 @@
+{% extends "core/base.html" %}
+
+{% block title %}Contatos{% endblock %}
+
+{% block header %}
+<h1>Contatos</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="list-header">
+        <div>
+            <h2 class="list-title">Lista de contatos</h2>
+            <p class="list-subtitle">
+                Cadastre clientes, fornecedores, parceiros, funcionários, responsáveis técnicos e outros
+                relacionamentos.
+            </p>
+        </div>
+        <a href="{% url 'core:contatos_create' %}" class="btn btn-primary">Novo contato</a>
+    </div>
+
+    {% if contatos %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome / Fantasia</th>
+                <th>Relacionamento</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Ativo</th>
+                <th style="width:1%;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contato in contatos %}
+            {% with relacionamento_list=contato.get_relacionamentos_display %}
+            <tr>
+                <td>{{ contato.nome_fantasia }}</td>
+                <td>
+                    {% if relacionamento_list %}
+                    <div class="chip-group">
+                        {% for rel in relacionamento_list %}
+                        <span class="chip">
+                            {% if rel == "cliente" %}Cliente
+                            {% elif rel == "funcionario" %}Funcionário
+                            {% elif rel == "parceiro" %}Parceiro
+                            {% elif rel == "fornecedor" %}Fornecedor
+                            {% elif rel == "responsavel_tecnico" %}Resp. técnico
+                            {% else %}Outros{% endif %}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>{{ contato.email }}</td>
+                <td>{{ contato.telefone }}</td>
+                <td>
+                    {% if contato.ativo %}
+                    <span class="status-pill status-pill-on">Ativo</span>
+                    {% else %}
+                    <span class="status-pill status-pill-off">Inativo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display:flex; gap:0.25rem;">
+                        <a href="{% url 'core:contatos_update' contato.pk %}" class="btn btn-outline btn-small">
+                            Editar
+                        </a>
+                        <a href="{% url 'core:contatos_delete' contato.pk %}" class="btn btn-outline btn-small"
+                            style="border-color:#ef4444; color:#ef4444;">
+                            Remover
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endwith %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Nenhum contato cadastrado ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}c

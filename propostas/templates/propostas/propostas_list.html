@@ -1,0 +1,710 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Propostas{% endblock %}
+
+{% block header %}
+<h1>Propostas</h1>
+<p class="text-muted">Acompanhe seu funil de propostas em tempo real.</p>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/proposta.css' %}">
+
+<div class="propostas-layout">
+
+  <!-- Filtros (busca + link para histórico) -->
+  <div class="card filtros-card">
+    <form method="get" class="filtros-form">
+      <div class="filtros-grid">
+        <div class="form-group">
+          <label for="id_busca">Buscar</label>
+          <input type="text" id="id_busca" name="q" class="form-control"
+                 placeholder="Nº, título, cliente..."
+                 value="{{ busca }}">
+        </div>
+        <div class="form-group filtros-actions">
+          <label>&nbsp;</label>
+          <div class="filtros-actions-inline">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="{% url 'propostas:propostas_historico' %}" class="btn btn-outline">
+              Ver histórico
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Kanban -->
+  <div class="card kanban-card">
+    <div class="kanban-header">
+      <div>
+        <h2>Funil de propostas</h2>
+        <p class="text-muted">Visualize rapidamente seus rascunhos e propostas em andamento.</p>
+      </div>
+      <a href="{% url 'propostas:proposta_create' %}" class="btn btn-primary">
+        Nova proposta
+      </a>
+    </div>
+
+    <div class="kanban-board">
+      <!-- Coluna Rascunho -->
+      <div class="kanban-column">
+        <div class="kanban-column-header">
+          <h3>Rascunho</h3>
+          <span class="kanban-pills">{{ rascunhos|length }}</span>
+        </div>
+        <div class="kanban-column-body">
+          {% if rascunhos %}
+            {% for p in rascunhos %}
+            <div class="kanban-card" data-proposta-id="{{ p.pk }}">
+              <div class="kanban-card-header">
+                <span class="kanban-card-badge">Nº {{ p.numero }}</span>
+                <span class="kanban-card-date">
+                  {{ p.created_at|date:"d/m/Y" }}
+                </span>
+              </div>
+
+              <div class="kanban-card-title">
+                {{ p.titulo_servico|default:"[Sem título]" }}
+              </div>
+              <div class="kanban-card-subtitle">
+                {{ p.cliente|default:"[Sem cliente]" }}
+              </div>
+
+              <div class="kanban-card-meta">
+                {% if p.usar_modelo_sistema %}
+                  <span class="tag-entrega tag-entrega-pdf">PDF</span>
+                  {% if p.public_token %}
+                    <span class="tag-entrega tag-entrega-online">Online</span>
+                  {% endif %}
+                {% else %}
+                  {% if p.modelo_proprio_arquivo %}
+                    <span class="tag-entrega tag-entrega-pdf">PDF modelo próprio</span>
+                  {% endif %}
+                {% endif %}
+
+                {% if p.revisao_solicitada_em %}
+                  <span class="kanban-card-tag-revisao">
+                    Revisão solicitada
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="kanban-card-footer">
+                <div class="kanban-card-footer-left">
+                  <span class="kanban-card-total">
+                    {% if p.total %}
+                      R$ {{ p.total|floatformat:2 }}
+                    {% else %}
+                      [sem total]
+                    {% endif %}
+                  </span>
+                </div>
+
+                <div class="kanban-card-status">
+                  <span class="status-chip status-chip-rascunho">Rascunho</span>
+
+                  <div class="card-actions-menu">
+                    <button type="button"
+                            class="card-actions-toggle"
+                            aria-label="Ações da proposta">
+                      ⋯
+                    </button>
+                    <div class="card-actions-dropdown">
+                      <div class="card-actions-header">Ações</div>
+
+                      <button type="button"
+                              class="dropdown-item"
+                              onclick="window.location.href='{% url 'propostas:proposta_edit' pk=p.pk %}'">
+                        <span class="dropdown-icon">✏️</span>
+                        <span class="dropdown-text">Abrir</span>
+                      </button>
+
+                      {% if p.usar_modelo_sistema %}
+                        <a href="{% url 'propostas:proposta_public_pdf' pk=p.pk %}"
+                           target="_blank"
+                           class="dropdown-item">
+                          <span class="dropdown-icon">📄</span>
+                          <span class="dropdown-text">Baixar PDF</span>
+                        </a>
+                        {% if p.public_token %}
+                          <a href="{% url 'propostas:proposta_public_view' token=p.public_token %}"
+                             target="_blank"
+                             class="dropdown-item">
+                            <span class="dropdown-icon">🌐</span>
+                            <span class="dropdown-text">Ver online</span>
+                          </a>
+                        {% endif %}
+                      {% else %}
+                        {% if p.modelo_proprio_arquivo %}
+                          <a href="{{ p.modelo_proprio_arquivo.url }}"
+                             target="_blank"
+                             class="dropdown-item">
+                            <span class="dropdown-icon">📄</span>
+                            <span class="dropdown-text">Abrir PDF modelo próprio</span>
+                          </a>
+                        {% endif %}
+                      {% endif %}
+
+                      <div class="dropdown-separator"></div>
+
+                      <button type="button"
+                              class="dropdown-item dropdown-delete-btn"
+                              data-delete-url="{% url 'propostas:proposta_delete' pk=p.pk %}"
+                              data-proposta-label="Proposta {{ p.numero }}">
+                        <span class="dropdown-icon">🗑️</span>
+                        <span class="dropdown-text dropdown-text-danger">Excluir</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="kanban-empty text-muted">Nenhuma proposta em rascunho.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Coluna Em andamento -->
+      <div class="kanban-column">
+        <div class="kanban-column-header">
+          <h3>Em andamento</h3>
+          <span class="kanban-pills">{{ em_andamento|length }}</span>
+        </div>
+        <div class="kanban-column-body">
+          {% if em_andamento %}
+            {% for p in em_andamento %}
+            <div class="kanban-card" data-proposta-id="{{ p.pk }}">
+              <div class="kanban-card-header">
+                <span class="kanban-card-badge">Nº {{ p.numero }}</span>
+                <span class="kanban-card-date">
+                  {{ p.updated_at|date:"d/m/Y" }}
+                </span>
+              </div>
+
+              <div class="kanban-card-title">
+                {{ p.titulo_servico|default:"[Sem título]" }}
+              </div>
+              <div class="kanban-card-subtitle">
+                {{ p.cliente|default:"[Sem cliente]" }}
+              </div>
+
+              <div class="kanban-card-meta">
+                {% if p.usar_modelo_sistema %}
+                  <span class="tag-entrega tag-entrega-pdf">PDF</span>
+                  {% if p.public_token %}
+                    <span class="tag-entrega tag-entrega-online">Online</span>
+                  {% endif %}
+                {% else %}
+                  {% if p.modelo_proprio_arquivo %}
+                    <span class="tag-entrega tag-entrega-pdf">PDF modelo próprio</span>
+                  {% endif %}
+                {% endif %}
+
+                {% if p.revisao_solicitada_em %}
+                  <span class="kanban-card-tag-revisao">
+                    Revisão solicitada
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="kanban-card-footer">
+                <div class="kanban-card-footer-left">
+                  <span class="kanban-card-total">
+                    {% if p.total %}
+                      R$ {{ p.total|floatformat:2 }}
+                    {% else %}
+                      [sem total]
+                    {% endif %}
+                  </span>
+                </div>
+
+                <div class="kanban-card-status">
+                  <span class="status-chip status-chip-andamento">Em andamento</span>
+
+                  <div class="card-actions-menu">
+                    <button type="button"
+                            class="card-actions-toggle"
+                            aria-label="Ações da proposta">
+                      ⋯
+                    </button>
+                    <div class="card-actions-dropdown">
+                      <div class="card-actions-header">Ações</div>
+
+                      <button type="button"
+                              class="dropdown-item"
+                              onclick="window.location.href='{% url 'propostas:proposta_edit' pk=p.pk %}'">
+                        <span class="dropdown-icon">✏️</span>
+                        <span class="dropdown-text">Abrir</span>
+                      </button>
+
+                      {% if p.usar_modelo_sistema %}
+                        <a href="{% url 'propostas:proposta_public_pdf' pk=p.pk %}"
+                           target="_blank"
+                           class="dropdown-item">
+                          <span class="dropdown-icon">📄</span>
+                          <span class="dropdown-text">Baixar PDF</span>
+                        </a>
+                        {% if p.public_token %}
+                          <a href="{% url 'propostas:proposta_public_view' token=p.public_token %}"
+                             target="_blank"
+                             class="dropdown-item">
+                            <span class="dropdown-icon">🌐</span>
+                            <span class="dropdown-text">Ver online</span>
+                          </a>
+                        {% endif %}
+                      {% else %}
+                        {% if p.modelo_proprio_arquivo %}
+                          <a href="{{ p.modelo_proprio_arquivo.url }}"
+                             target="_blank"
+                             class="dropdown-item">
+                            <span class="dropdown-icon">📄</span>
+                            <span class="dropdown-text">Abrir PDF modelo próprio</span>
+                          </a>
+                        {% endif %}
+                      {% endif %}
+
+                      <div class="dropdown-separator"></div>
+
+                      <button type="button"
+                              class="dropdown-item dropdown-delete-btn"
+                              data-delete-url="{% url 'propostas:proposta_delete' pk=p.pk %}"
+                              data-proposta-label="Proposta {{ p.numero }}">
+                        <span class="dropdown-icon">🗑️</span>
+                        <span class="dropdown-text dropdown-text-danger">Excluir</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="kanban-empty text-muted">Nenhuma proposta em andamento.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{# MODAL GENÉRICO DE CONFIRMAÇÃO DE EXCLUSÃO #}
+<div class="modal-backdrop" id="modalDeleteBackdrop" aria-hidden="true" style="display:none;">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalDeleteTitle">
+    <div class="modal-header">
+      <h2 id="modalDeleteTitle">Excluir proposta</h2>
+    </div>
+    <div class="modal-body">
+      <p id="modalDeleteMessage">
+        Tem certeza que deseja excluir esta proposta?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" id="btnCancelarDelete">Cancelar</button>
+      <form method="post" id="modalDeleteForm" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-danger-strong">Excluir</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.propostas-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.propostas-layout .card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+/* Filtros */
+.filtros-form .filtros-grid {
+  display: grid;
+  grid-template-columns: 2fr auto;
+  gap: 12px;
+}
+.filtros-actions {
+  display: flex;
+  align-items: flex-end;
+}
+.filtros-actions-inline {
+  display: flex;
+  gap: 8px;
+}
+
+/* Kanban */
+.kanban-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.kanban-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.kanban-column {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 12px;
+}
+.kanban-column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.kanban-column-header h3 {
+  margin: 0;
+  font-size: 14px;
+}
+.kanban-pills {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  font-size: 12px;
+}
+.kanban-column-body {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.kanban-empty {
+  font-size: 13px;
+}
+
+.kanban-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px 12px 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+  color: inherit;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.kanban-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
+}
+.kanban-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.kanban-card-badge {
+  font-weight: 600;
+}
+.kanban-card-date {
+  font-size: 11px;
+}
+.kanban-card-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.kanban-card-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.kanban-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+/* tags de entrega (PDF/Online) */
+.tag-entrega {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.tag-entrega-pdf {
+  background: #e5e7eb;
+  color: #374151;
+}
+.tag-entrega-online {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.kanban-card-tag-revisao {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f973161a;
+  color: #ea580c;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* footer + status chip */
+.kanban-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  gap: 8px;
+}
+.kanban-card-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.kanban-card-total {
+  font-weight: 600;
+}
+
+.kanban-card-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-chip {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-chip-rascunho {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.status-chip-andamento {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* menu ... refinado */
+.card-actions-menu {
+  position: relative;
+}
+.card-actions-toggle {
+  border: none;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-actions-toggle:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* Dropdown UI/UX */
+.card-actions-dropdown {
+  position: absolute;
+  right: 0;
+  top: 130%;
+  min-width: 180px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+  padding: 4px 0;
+  display: none;
+  z-index: 20;
+  overflow: hidden;
+  animation: dropdown-fade-in 0.12s ease-out;
+}
+
+.card-actions-header {
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: none;
+  background: transparent;
+  color: #374151;
+  text-decoration: none;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background: #f3f4f6;
+}
+
+.dropdown-icon {
+  width: 16px;
+  text-align: center;
+  font-size: 13px;
+}
+.dropdown-text {
+  flex: 1;
+  text-align: left;
+}
+.dropdown-text-danger {
+  color: #b91c1c;
+}
+
+.dropdown-separator {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 8px;
+}
+
+/* animação sutil */
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal delete aproveita estilo dos outros modais do seu projeto */
+.modal-backdrop#modalDeleteBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+#modalDeleteBackdrop .modal-card {
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  padding: 16px 18px;
+}
+.btn-danger-strong {
+  background: #dc2626;
+  border-color: #b91c1c;
+}
+.btn-danger-strong:hover {
+  background: #b91c1c;
+  border-color: #991b1b;
+}
+
+@media (max-width: 1200px) {
+  .propostas-layout {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+}
+@media (max-width: 900px) {
+  .filtros-form .filtros-grid {
+    grid-template-columns: 1fr;
+  }
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<script>
+(function () {
+  // Dropdown "..." em cada card
+  document.querySelectorAll(".card-actions-toggle").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const dropdown = btn.parentElement.querySelector(".card-actions-dropdown");
+      const isOpen = dropdown.style.display === "block";
+      // fecha todos
+      document.querySelectorAll(".card-actions-dropdown").forEach(function (dd) {
+        dd.style.display = "none";
+      });
+      dropdown.style.display = isOpen ? "none" : "block";
+    });
+  });
+
+  // Fechar dropdown ao clicar fora
+  document.addEventListener("click", function () {
+    document.querySelectorAll(".card-actions-dropdown").forEach(function (dd) {
+      dd.style.display = "none";
+    });
+  });
+
+  // Modal de exclusão
+  const modalBackdrop = document.getElementById("modalDeleteBackdrop");
+  const modalForm = document.getElementById("modalDeleteForm");
+  const modalMsg = document.getElementById("modalDeleteMessage");
+  const btnCancelar = document.getElementById("btnCancelarDelete");
+
+  function abrirModal(deleteUrl, label) {
+    if (!modalBackdrop || !modalForm) return;
+    modalForm.action = deleteUrl;
+    modalMsg.textContent = `Tem certeza que deseja excluir ${label}?`;
+    modalBackdrop.style.display = "flex";
+    modalBackdrop.setAttribute("aria-hidden", "false");
+  }
+
+  function fecharModal() {
+    if (!modalBackdrop) return;
+    modalBackdrop.style.display = "none";
+    modalBackdrop.setAttribute("aria-hidden", "true");
+  }
+
+  document.querySelectorAll(".dropdown-delete-btn").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const url = btn.getAttribute("data-delete-url");
+      const label = btn.getAttribute("data-proposta-label") || "esta proposta";
+      abrirModal(url, label);
+      // fecha qualquer dropdown aberto
+      document.querySelectorAll(".card-actions-dropdown").forEach(function (dd) {
+        dd.style.display = "none";
+      });
+    });
+  });
+
+  btnCancelar?.addEventListener("click", function () {
+    fecharModal();
+  });
+
+  modalBackdrop?.addEventListener("click", function (e) {
+    if (e.target === modalBackdrop) fecharModal();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") fecharModal();
+  });
+})();
+</script>
+
+{% endblock %}

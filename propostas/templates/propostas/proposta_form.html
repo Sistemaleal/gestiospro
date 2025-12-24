@@ -1,0 +1,731 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}
+{% if proposta %}Editar proposta {{ proposta.numero }}{% else %}Nova proposta{% endif %}
+{% endblock %}
+
+{% block header %}
+<h1>{% if proposta %}Editar proposta{% else %}Nova proposta{% endif %}</h1>
+<p class="text-muted">Preencha as informações da proposta em etapas.</p>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/proposta.css' %}">
+
+<div class="card card-page proposta-card">
+  <form method="post" id="propostaForm" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert-error">
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <!-- Cabeçalho resumido -->
+    <div class="proposta-header-strip">
+      <div>
+        <div class="chip">
+          {% if proposta %}Nº {{ proposta.numero }}{% else %}Nova proposta{% endif %}
+        </div>
+        {% if proposta %}
+        <div class="text-muted small">
+          Criada em {{ proposta.created_at|date:"d/m/Y H:i" }} –
+          Status: {{ proposta.get_status_display }}
+        </div>
+        {% endif %}
+      </div>
+
+      {% if proposta %}
+      <div class="chip-group">
+        {% if proposta.usar_modelo_sistema %}
+          <span class="chip">
+            PDF:
+            <a href="{% url 'propostas:proposta_public_pdf' pk=proposta.pk %}" target="_blank">
+              baixar
+            </a>
+          </span>
+
+          {% if proposta.public_token %}
+          <span class="chip">
+            Proposta online:
+            <a href="{% url 'propostas:proposta_public_view' token=proposta.public_token %}" target="_blank">
+              abrir
+            </a>
+          </span>
+          {% else %}
+          <span class="chip">
+            Proposta online: [sem link público]
+          </span>
+          {% endif %}
+        {% else %}
+          {% if proposta.modelo_proprio_arquivo %}
+          <span class="chip">
+            Modelo próprio:
+            <a href="{{ proposta.modelo_proprio_arquivo.url }}" target="_blank">
+              abrir
+            </a>
+          </span>
+          {% else %}
+          <span class="chip">
+            Modelo próprio: [nenhum arquivo anexado]
+          </span>
+          {% endif %}
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Abas -->
+    <div class="proposta-tabs">
+      <button type="button" class="proposta-tab active" data-tab="dados">
+        <span class="step-index">1</span> Dados gerais
+      </button>
+      <button type="button" class="proposta-tab" data-tab="servicos">
+        <span class="step-index">2</span> Serviços
+      </button>
+      <button type="button" class="proposta-tab" data-tab="financeiro">
+        <span class="step-index">3</span> Financeiro
+      </button>
+      <button type="button" class="proposta-tab" data-tab="finalizacao">
+        <span class="step-index">4</span> Finalização
+      </button>
+    </div>
+
+    <div class="proposta-tabs-content">
+
+      <!-- ABA 1 – DADOS GERAIS -->
+      <section class="proposta-tab-panel active" data-tab="dados">
+        <div class="form-grid">
+
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">Dados gerais</h2>
+              <p class="form-section-help">
+                Informações principais da proposta, captação e cliente.
+              </p>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group required">
+                <label for="{{ form.numero.id_for_label }}">Número da proposta</label>
+                <div class="form-inline">
+                  {{ form.numero }}
+                  <button type="button" class="btn btn-outline btn-small" id="btnGerarNumeroProposta">
+                    Gerar automático
+                  </button>
+                </div>
+                {{ form.numero.errors }}
+                <p class="text-muted small">
+                  Clique em “Gerar automático” para montar o número com base nas definições da empresa.
+                </p>
+              </div>
+
+              <div class="form-group required">
+                <label for="{{ form.titulo_servico.id_for_label }}">Título do serviço</label>
+                {{ form.titulo_servico }}
+                {{ form.titulo_servico.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.data_servico.id_for_label }}">Data da proposta</label>
+                {{ form.data_servico }}
+                {{ form.data_servico.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.validade.id_for_label }}">Validade da proposta</label>
+                {{ form.validade }}
+                {{ form.validade.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.captacao.id_for_label }}">Captação</label>
+                <div class="form-inline">
+                  {{ form.captacao }}
+                  <button type="button" class="btn btn-outline btn-small" id="btnNovaCaptacao">
+                    Nova captação
+                  </button>
+                </div>
+                {{ form.captacao.errors }}
+                <p class="text-muted">
+                  Ex.: Cliente direto, Instagram, YouTube, indicação...
+                </p>
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.status.id_for_label }}">Status</label>
+                {{ form.status }}
+                {{ form.status.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.cliente.id_for_label }}">Cliente</label>
+                {{ form.cliente }}
+                {{ form.cliente.errors }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">Endereço da obra</h2>
+              <p class="form-section-help">Endereço onde os serviços serão realizados.</p>
+            </div>
+
+            <div class="form-grid-3">
+              <div class="form-group with-addon">
+                <label for="{{ form.cep.id_for_label }}">CEP</label>
+                <div class="form-inline">
+                  {{ form.cep }}
+                  <button type="button" class="input-addon" id="btnBuscarCep">Buscar CEP</button>
+                </div>
+                {{ form.cep.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.logradouro.id_for_label }}">Logradouro</label>
+                {{ form.logradouro }}
+                {{ form.logradouro.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.numero_end.id_for_label }}">Número</label>
+                {{ form.numero_end }}
+                {{ form.numero_end.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.bairro.id_for_label }}">Bairro</label>
+                {{ form.bairro }}
+                {{ form.bairro.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.cidade.id_for_label }}">Cidade</label>
+                {{ form.cidade }}
+                {{ form.cidade.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.uf.id_for_label }}">UF</label>
+                {{ form.uf }}
+                {{ form.uf.errors }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.complemento.id_for_label }}">Complemento</label>
+                {{ form.complemento }}
+                {{ form.complemento.errors }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 2 – SERVIÇOS -->
+      <section class="proposta-tab-panel" data-tab="servicos">
+        <div class="form-section">
+          <div class="form-section-header">
+            <h2 class="form-section-title">Serviços</h2>
+            <p class="form-section-help">
+              Adicione os serviços desta proposta. Você pode ajustar os valores mesmo que exista um valor
+              padrão no cadastro.
+            </p>
+          </div>
+
+          <div class="proposta-servicos-toolbar">
+            <div class="form-group">
+              <label>Adicionar serviço</label>
+              <div class="form-inline">
+                <select id="servicoSelect" class="form-control">
+                  <option value="">Selecione um serviço cadastrado...</option>
+                  {% for s in servicos %}
+                  <option value="{{ s.id }}" data-valor="{{ s.valor }}"
+                          data-entregaveis="{{ s.entregaveis|default_if_none:'' }}">
+                    {{ s.descricao }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <button type="button" class="btn btn-primary btn-small" id="btnAdicionarServico">
+                  Incluir
+                </button>
+
+                <button type="button" class="btn btn-outline btn-small" id="btnAddItemPersonalizado"
+                        style="margin-left:8px;">
+                  Adicionar item personalizado
+                </button>
+              </div>
+              <p class="text-muted">
+                Os serviços serão adicionados na lista abaixo. Você pode editar o valor unitário ou
+                total conforme necessário.
+              </p>
+            </div>
+          </div>
+
+          <div class="proposta-servicos-table-wrapper">
+            <table class="table proposta-servicos-table" id="tabelaServicos">
+              <thead>
+                <tr>
+                  <th>Serviço</th>
+                  <th style="width:140px;">Valor total (R$)</th>
+                  <th style="width:80px;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- linhas controladas via JS -->
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="right"><strong>Subtotal</strong></td>
+                  <td colspan="2">
+                    <span id="subtotalDisplay">R$ 0,00</span>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <input type="hidden" name="itens_json" id="itensJsonInput" />
+        </div>
+      </section>
+
+      <!-- ABA 3 – FINANCEIRO -->
+      <section class="proposta-tab-panel" data-tab="financeiro">
+        <div class="form-section">
+          <div class="form-section-header">
+            <h2 class="form-section-title">Financeiro</h2>
+            <p class="form-section-help">
+              Defina o desconto e veja o resumo de valores da proposta.
+            </p>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label for="descontoModo">Tipo de desconto</label>
+              <select id="descontoModo" name="desconto_modo" class="form-control">
+                <option value="valor"
+                  {% if proposta and proposta.desconto_modo == "valor" %}selected{% endif %}>
+                  Valor fixo (R$)
+                </option>
+                <option value="percentual"
+                  {% if proposta and proposta.desconto_modo == "percentual" %}selected{% endif %}>
+                  Percentual (%)
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="descontoInput">Desconto</label>
+              <input
+                type="number"
+                step="0.01"
+                id="descontoInput"
+                name="desconto_input"
+                class="form-control"
+                value="{% if proposta and proposta.desconto_input is not None %}{{ proposta.desconto_input|stringformat:'.2f'|cut:',' }}{% else %}0.00{% endif %}">
+            </div>
+            <div class="form-group">
+              <label>Resumo</label>
+              <div class="proposta-financeiro-resumo">
+                <div>Subtotal: <span id="finSubtotal">R$ 0,00</span></div>
+                <div>Desconto: <span id="finDesconto">R$ 0,00</span></div>
+                <div><strong>Total: <span id="finTotal">R$ 0,00</span></strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parcelamento -->
+        <div class="form-section">
+          <div class="form-section-header">
+            <h2 class="form-section-title">Formas de pagamento</h2>
+            <p class="form-section-help">
+              Defina o número de parcelas, periodicidade e gere automaticamente os marcos.
+            </p>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label for="parcelasQtd">Número de parcelas</label>
+              <input type="number" min="1" max="60" id="parcelasQtd" class="form-control" value="1" />
+            </div>
+            <div class="form-group">
+              <label for="parcelasTipo">Periodicidade</label>
+              <select id="parcelasTipo" class="form-control">
+                <option value="unico">Pagamento único</option>
+                <option value="mensal">Mensal</option>
+                <option value="bimestral">Bimestral</option>
+                <option value="trimestral">Trimestral</option>
+                <option value="semestral">Semestral</option>
+                <option value="anual">Anual</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button type="button" class="btn btn-outline btn-small" id="btnGerarParcelas">
+                Gerar parcelas
+              </button>
+            </div>
+          </div>
+
+          <div class="proposta-parcelas-table-wrapper">
+            <table class="table proposta-parcelas-table" id="tabelaParcelas">
+              <thead>
+                <tr>
+                  <th style="width:80px;">Parcela</th>
+                  <th style="width:110px;">Percentual (%)</th>
+                  <th style="width:140px;">Valor (R$)</th>
+                  <th>Marco / Observação</th>
+                  <th style="width:60px;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- linhas controladas via JS -->
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" class="right">Soma dos valores</td>
+                  <td colspan="3">
+                    <span id="parcelasTotal">R$ 0,00</span>
+                    <span id="parcelasDiferenca" class="text-muted"></span>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <input type="hidden" name="parcelas_json" id="parcelasJsonInput" />
+        </div>
+      </section>
+
+      <!-- ABA 4 – FINALIZAÇÃO -->
+      <section class="proposta-tab-panel" data-tab="finalizacao">
+
+        <!-- Seletor de modo -->
+        <div class="form-section">
+          <div class="form-section-header">
+            <h2 class="form-section-title">Finalização da proposta</h2>
+            <p class="form-section-help">
+              Escolha se deseja anexar seu próprio modelo de proposta ou usar o modelo do sistema.
+            </p>
+          </div>
+
+          <div class="form-group">
+            <div class="form-inline">
+              <label style="margin-right:16px;">
+                <input type="radio" name="usar_modelo_sistema"
+                       value="0"
+                       {% if proposta and not proposta.usar_modelo_sistema %}checked{% endif %}
+                       {% if not proposta %}checked{% endif %}>
+                Anexar meu modelo de proposta
+              </label>
+              <label>
+                <input type="radio" name="usar_modelo_sistema"
+                       value="1"
+                       {% if proposta and proposta.usar_modelo_sistema %}checked{% endif %}>
+                Usar modelo do sistema
+              </label>
+            </div>
+            <p class="text-muted small">
+              • <strong>Anexar meu modelo de proposta</strong>: envie um arquivo pronto com a sua proposta.<br>
+              • <strong>Modelo do sistema</strong>: use os textos gerados (objetivo, escopo, investimentos etc.).
+            </p>
+          </div>
+        </div>
+
+        <!-- BLOCO: MODO ANEXO -->
+        <div id="blocoFinalizacaoAnexo" class="form-section"
+             {% if proposta and proposta.usar_modelo_sistema %}style="display:none;"{% endif %}>
+          <div class="form-section-header">
+            <h2 class="form-section-title">Anexar meu modelo de proposta</h2>
+            <p class="form-section-help">
+              Envie o arquivo com a sua proposta já formatada.
+            </p>
+          </div>
+          <div class="form-group">
+            <input type="file" name="modelo_proprio_arquivo" id="id_modelo_proprio_arquivo">
+            <p class="text-muted">
+              Tipos permitidos: PDF, DOC, DOCX, imagens. Tamanho máximo: [X] MB.
+            </p>
+
+            {% if proposta and proposta.modelo_proprio_arquivo %}
+              <p class="text-muted" style="margin-top: 8px;">
+                Arquivo atual:
+                <a href="{{ proposta.modelo_proprio_arquivo.url }}" target="_blank">
+                  baixar / abrir
+                </a>
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- BLOCO: MODO SISTEMA -->
+        <div id="blocoFinalizacaoSistema"
+             {% if not proposta or not proposta.usar_modelo_sistema %}style="display:none;"{% endif %}>
+
+          <!-- TOPO -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">
+                {{ proposta.titulo_servico|default:form.titulo_servico.value|default:"[Título do serviço]" }}
+              </h2>
+              <p class="form-section-help">
+                Cliente:
+                {% if proposta %}{{ proposta.cliente }}{% else %}[Cliente]{% endif %}<br>
+                Data da proposta:
+                {% if proposta and proposta.data_servico %}
+                  {{ proposta.data_servico|date:"d/m/Y" }}
+                {% else %}
+                  [Data]
+                {% endif %}
+                –
+                Validade:
+                {% if proposta and proposta.validade %}
+                  {{ proposta.validade|date:"d/m/Y" }}
+                {% else %}
+                  [Validade]
+                {% endif %}
+                –
+                Nº {{ proposta.numero|default:form.numero.value|default:"[número]" }}
+              </p>
+            </div>
+          </div>
+
+          <!-- 1. OBJETIVO -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">1. Objetivo</h2>
+              <p class="form-section-help">
+                Gerado automaticamente a partir dos serviços e do endereço da obra. Você pode ajustar o texto.
+              </p>
+            </div>
+            <div class="form-group">
+              <textarea id="objetivoTexto" name="objetivo_texto" rows="4"
+                        class="form-control">{% if proposta %}{{ proposta.objetivo_texto }}{% endif %}</textarea>
+              <button type="button" class="btn btn-outline btn-small" id="btnGerarObjetivo">
+                Gerar objetivo
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. ESCOPO DO PROJETO -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">2. Escopo do projeto</h2>
+              <p class="form-section-help">
+                Será montado com base nos serviços selecionados e seus entregáveis. Somente os entregáveis podem ser
+                editados.
+              </p>
+            </div>
+            <div class="form-group">
+              <textarea id="escopoTexto" name="escopo_texto" rows="8"
+                        class="form-control">{% if proposta and proposta.escopo_texto %}{{ proposta.escopo_texto }}{% endif %}</textarea>
+              <button type="button" class="btn btn-outline btn-small" id="btnGerarEscopo">
+                Gerar escopo
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. EXCLUSÕES -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">3. Exclusões</h2>
+              <p class="form-section-help">
+                Texto padrão vindo de Configurações &gt; Definições de propostas. Você pode ajustar conforme necessário.
+              </p>
+            </div>
+            <div class="form-group">
+              <div class="form-inline" style="justify-content: space-between; align-items: center;">
+                <button type="button" class="btn btn-outline btn-small" id="btnResetExclusoes">
+                  Recarregar padrão
+                </button>
+              </div>
+              <textarea id="exclusosTexto" name="exclusos_texto" rows="4"
+                        class="form-control">{% if proposta %}{{ proposta.exclusos_texto }}{% else %}{{ form.initial.exclusos_texto|default_if_none:"" }}{% endif %}</textarea>
+            </div>
+          </div>
+
+          <!-- 4. INVESTIMENTOS E FORMA DE PAGAMENTO -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">4. Investimentos e forma de pagamento</h2>
+              <p class="form-section-help">
+                Tabela de serviços e valores, com resumo de subtotal, desconto e total, seguida do resumo das parcelas.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="exibirApenasTotal" name="exibir_apenas_total"
+                       {% if proposta and proposta.exibir_apenas_total %}checked{% endif %}>
+                Exibir apenas total (ocultar detalhamento por serviço)
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label>4.1. Proposta – serviços e valores</label>
+              <div id="investTabelaWrapper" class="proposta-investimentos-tabela">
+                <!-- tabela gerada via JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="investimentosTexto">4.2. Texto de investimentos e forma de pagamento</label>
+              <textarea id="investimentosTexto" name="investimentos_texto" rows="6"
+                        class="form-control">{% if proposta and proposta.investimentos_texto %}{{ proposta.investimentos_texto }}{% endif %}</textarea>
+              <button type="button" class="btn btn-outline btn-small" id="btnGerarInvestimentos">
+                Gerar texto de investimentos
+              </button>
+            </div>
+          </div>
+
+          <!-- 5. PRAZOS -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">5. Prazos</h2>
+            </div>
+
+            <div class="form-group">
+              <div class="form-inline" style="justify-content: space-between; align-items: center;">
+                <label for="prazoInicioTexto">5.1. Prazo para início dos serviços</label>
+                <button type="button" class="btn btn-outline btn-small" id="btnResetPrazoInicio">
+                  Recarregar padrão
+                </button>
+              </div>
+              <textarea id="prazoInicioTexto" name="prazo_inicio_texto" rows="3"
+                        class="form-control">{% if proposta %}{{ proposta.prazo_inicio_texto }}{% else %}{{ form.initial.prazo_inicio_texto|default_if_none:"" }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-group">
+              <div class="form-inline" style="justify-content: space-between; align-items: center;">
+                <label for="prazoEntregaTexto">5.2. Prazo para entrega dos serviços</label>
+                <button type="button" class="btn btn-outline btn-small" id="btnResetPrazoEntrega">
+                  Recarregar padrão
+                </button>
+              </div>
+              <textarea id="prazoEntregaTexto" name="prazo_entrega_texto" rows="3"
+                        class="form-control">{% if proposta %}{{ proposta.prazo_entrega_texto }}{% else %}{{ form.initial.prazo_entrega_texto|default_if_none:"" }}{% endif %}</textarea>
+            </div>
+          </div>
+
+          <!-- 6. DECLARAÇÕES -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">6. Declarações</h2>
+            </div>
+            <div class="form-group">
+              <div class="form-inline" style="justify-content: space-between; align-items: center;">
+                <button type="button" class="btn btn-outline btn-small" id="btnResetDeclaracoes">
+                  Recarregar padrão
+                </button>
+              </div>
+              <textarea id="declaracoesTexto" name="declaracoes_texto" rows="4"
+                        class="form-control">{% if proposta %}{{ proposta.declaracoes_texto }}{% else %}{{ form.initial.declaracoes_texto|default_if_none:"" }}{% endif %}</textarea>
+            </div>
+          </div>
+
+          <!-- 7. TERMO DE CONFIDENCIALIDADE -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">7. Termo de confidencialidade</h2>
+            </div>
+            <div class="form-group">
+              <div class="form-inline" style="justify-content: space-between; align-items: center;">
+                <button type="button" class="btn btn-outline btn-small" id="btnResetConfidencialidade">
+                  Recarregar padrão
+                </button>
+              </div>
+              <textarea id="confidencialidadeTexto" name="confidencialidade_texto" rows="4"
+                        class="form-control">{% if proposta %}{{ proposta.confidencialidade_texto }}{% else %}{{ form.initial.confidencialidade_texto|default_if_none:"" }}{% endif %}</textarea>
+            </div>
+          </div>
+
+          <!-- 8. AGRADECIMENTOS / ASSINATURA -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <h2 class="form-section-title">8. Agradecimentos / assinatura</h2>
+            </div>
+            <div class="form-group">
+              <div class="form-inline" style="justify-content: space-between; align-items: center;">
+                <button type="button" class="btn btn-outline btn-small" id="btnResetAssinatura">
+                  Recarregar padrão
+                </button>
+              </div>
+              <textarea id="assinaturaTexto" name="assinatura_texto" rows="3"
+                        class="form-control">{% if proposta %}{{ proposta.assinatura_texto }}{% else %}{{ form.initial.assinatura_texto|default_if_none:"" }}{% endif %}</textarea>
+            </div>
+          </div>
+
+        </div> <!-- fim blocoFinalizacaoSistema -->
+
+      </section>
+    </div>
+
+    <div class="form-actions proposta-actions">
+      <a href="{% url 'propostas:propostas_list' %}" class="btn btn-outline">Voltar</a>
+      <button type="submit" class="btn btn-primary">Salvar proposta</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<div id="propostaData"
+     data-itens='{% if proposta %}{{ proposta.itens|safe|escapejs }}{% else %}[]{% endif %}'
+     data-parcelas='{% if proposta %}{{ proposta.parcelas|default_if_none:"[]"|escapejs }}{% else %}[]{% endif %}'
+     data-captacao-create-url="{% url 'propostas:captacao_create' %}"
+     data-gerar-numero-url="{% url 'propostas:proposta_gerar_numero' %}"
+     data-textos-padrao='{
+       "exclusos_texto": "{{ form.initial.exclusos_texto|default_if_none:''|escapejs }}",
+       "prazo_inicio_texto": "{{ form.initial.prazo_inicio_texto|default_if_none:''|escapejs }}",
+       "prazo_entrega_texto": "{{ form.initial.prazo_entrega_texto|default_if_none:''|escapejs }}",
+       "declaracoes_texto": "{{ form.initial.declaracoes_texto|default_if_none:''|escapejs }}",
+       "confidencialidade_texto": "{{ form.initial.confidencialidade_texto|default_if_none:''|escapejs }}",
+       "assinatura_texto": "{{ form.initial.assinatura_texto|default_if_none:''|escapejs }}"
+     }'>
+</div>
+
+<div class="modal-backdrop" id="modalCaptacaoBackdrop" aria-hidden="true" style="display:none;">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalCaptacaoTitle">
+    <div class="modal-header">
+      <h2 id="modalCaptacaoTitle">Nova captação</h2>
+    </div>
+    <div class="modal-body">
+      <label class="modal-label" for="captacaoNome">Nome da captação</label>
+      <input id="captacaoNome" type="text" class="form-control" placeholder="Ex.: Instagram, Indicação..." />
+      <div id="captacaoError" class="modal-error is-hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" id="btnCancelarCaptacao">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnSalvarCaptacao">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modalItemPersonalizado" aria-hidden="true" style="display:none;">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalItemPersonalizadoTitle">
+    <div class="modal-header">
+      <h2 id="modalItemPersonalizadoTitle">Adicionar item personalizado</h2>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="itemPersonalizadoDescricao">Descrição do item</label>
+        <textarea id="itemPersonalizadoDescricao" class="form-control" rows="2"
+                  placeholder="Descreva o item personalizado"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="itemPersonalizadoValorTotal">Valor total (R$)</label>
+        <input type="number" id="itemPersonalizadoValorTotal" class="form-control"
+               placeholder="0,00" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" id="btnCancelarItemPersonalizado">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnSalvarItemPersonalizado">Adicionar item</button>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/propostas.js' %}"></script>
+{% endblock %}

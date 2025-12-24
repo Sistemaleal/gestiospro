@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+
+{% block title %}Página inicial{% endblock %}
+
+{% block header %}
+<h1>Resumo</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Bem-vindo ao Gestiospro</h2>
+    {% if empresa %}
+    <p>Empresa atual: <strong>{{ empresa.nome_fantasia }}</strong></p>
+    {% else %}
+    <p>Você ainda não está vinculado a uma empresa.</p>
+    {% endif %}
+    <p>As áreas de Propostas, Gestão de Projetos/Serviços, Financeiro e Dashboard serão ativadas em breve.</p>
+</div>
+{% endblock %}

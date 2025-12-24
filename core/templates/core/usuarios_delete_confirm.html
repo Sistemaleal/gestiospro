@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% block title %}Remover usuário{% endblock %}
+
+{% block header %}
+<h1>Remover usuário</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <p>
+        Tem certeza que deseja remover o usuário
+        <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>?
+    </p>
+
+    <form method="post" style="margin-top: 1rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="background: #ef4444; border-color: #ef4444;">
+            Sim, remover
+        </button>
+        <a href="{% url 'core:usuarios_list' %}" class="btn btn-outline">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}Gestiospro{% endblock %} - Gestiospro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+</head>
+
+<body>
+    <div class="app-body">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon">
+                    G
+                </div>
+                <div class="sidebar-logo-text">
+                    <span class="sidebar-title">Gestiospro</span>
+                    <span class="sidebar-subtitle">ERP Engenharia</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <!-- HOME -->
+                <a href="{% url 'core:home' %}" class="sidebar-item">
+                    <span class="sidebar-item-icon icon-home"></span>
+                    <span class="sidebar-item-label">Página inicial</span>
+                </a>
+
+                <!-- OPERAÇÕES -->
+                <div class="sidebar-section-label">Operações</div>
+
+                {# Propostas #}
+                <a href="{% url 'propostas:propostas_list' %}" class="sidebar-item">
+                    <span class="sidebar-item-icon icon-doc"></span>
+                    <span class="sidebar-item-label">Propostas</span>
+                    <span class="sidebar-permission-dot allowed"></span>
+                </a>
+
+                <!-- CADASTROS -->
+                <div class="sidebar-section-label">Cadastros</div>
+
+                {# Contatos #}
+                {% if request.user.can_manage_contatos %}
+                <a href="{% url 'core:contatos_list' %}" class="sidebar-item">
+                    {% else %}
+                    <a href="javascript:void(0);" class="sidebar-item sidebar-item-disabled"
+                        title="Você não tem permissão para acessar Contatos">
+                        {% endif %}
+                        <span class="sidebar-item-icon icon-users"></span>
+                        <span class="sidebar-item-label">Contatos</span>
+                        <span
+                            class="sidebar-permission-dot {% if request.user.can_manage_contatos %}allowed{% else %}denied{% endif %}"></span>
+                    </a>
+
+                    {# Serviços #}
+                    {% if request.user.can_manage_servicos %}
+                    <a href="{% url 'core:servicos_list' %}" class="sidebar-item">
+                        {% else %}
+                        <a href="javascript:void(0);" class="sidebar-item sidebar-item-disabled"
+                            title="Você não tem permissão para acessar Serviços">
+                            {% endif %}
+                            <span class="sidebar-item-icon icon-services"></span>
+                            <span class="sidebar-item-label">Serviços</span>
+                            <span
+                                class="sidebar-permission-dot {% if request.user.can_manage_servicos %}allowed{% else %}denied{% endif %}"></span>
+                        </a>
+
+                        {# Usuários #}
+                        {% if request.user.is_authenticated and request.user.user_type == "owner" %}
+                        <a href="{% url 'core:usuarios_list' %}" class="sidebar-item">
+                            {% elif request.user.can_manage_usuarios %}
+                            <a href="{% url 'core:usuarios_list' %}" class="sidebar-item">
+                                {% else %}
+                                <a href="javascript:void(0);" class="sidebar-item sidebar-item-disabled"
+                                    title="Você não tem permissão para acessar Usuários">
+                                    {% endif %}
+                                    <span class="sidebar-item-icon icon-user"></span>
+                                    <span class="sidebar-item-label">Usuários</span>
+                                    <span class="sidebar-permission-dot
+                            {% if request.user.is_authenticated and request.user.user_type == 'owner' %}
+                                allowed
+                            {% elif request.user.can_manage_usuarios %}
+                                allowed
+                            {% else %}
+                                denied
+                            {% endif %}
+                        "></span>
+                                </a>
+
+                                <!-- GESTÃO -->
+                                <div class="sidebar-section-label">Gestão</div>
+
+                                <a href="{% url 'core:em_breve' 'projetos' %}"
+                                    class="sidebar-item sidebar-item-disabled">
+                                    <span class="sidebar-item-icon icon-projects"></span>
+                                    <span class="sidebar-item-label">Gestão de Projetos/Serviços</span>
+                                    <span class="badge-em-breve">em breve</span>
+                                </a>
+
+                                <a href="{% url 'core:em_breve' 'financeiro' %}"
+                                    class="sidebar-item sidebar-item-disabled">
+                                    <span class="sidebar-item-icon icon-money"></span>
+                                    <span class="sidebar-item-label">Financeiro</span>
+                                    <span class="badge-em-breve">em breve</span>
+                                </a>
+
+                                <a href="{% url 'core:em_breve' 'dashboard' %}"
+                                    class="sidebar-item sidebar-item-disabled">
+                                    <span class="sidebar-item-icon icon-dashboard"></span>
+                                    <span class="sidebar-item-label">Dashboard</span>
+                                    <span class="badge-em-breve">em breve</span>
+                                </a>
+
+                                <!-- CONFIGURAÇÕES -->
+                                <div class="sidebar-section-label">Configurações</div>
+
+                                {# Definições da empresa #}
+                                {% if request.user.can_manage_definicoes %}
+                                <a href="{% url 'core:definicoes_empresa' %}" class="sidebar-item">
+                                    {% else %}
+                                    <a href="javascript:void(0);" class="sidebar-item sidebar-item-disabled"
+                                        title="Você não tem permissão para acessar Definições da empresa">
+                                        {% endif %}
+                                        <span class="sidebar-item-icon icon-settings"></span>
+                                        <span class="sidebar-item-label">Definições da empresa</span>
+                                        <span
+                                            class="sidebar-permission-dot {% if request.user.can_manage_definicoes %}allowed{% else %}denied{% endif %}"></span>
+                                    </a>
+
+                                    {# Definições de propostas #}
+                                    {% if request.user.can_manage_propostas_definicoes %}
+                                    <a href="{% url 'core:definicoes_propostas' %}" class="sidebar-item">
+                                        {% else %}
+                                        <a href="javascript:void(0);" class="sidebar-item sidebar-item-disabled"
+                                            title="Você não tem permissão para acessar Definições de propostas">
+                                            {% endif %}
+                                            <span class="sidebar-item-icon icon-doc"></span>
+                                            <span class="sidebar-item-label">Definições de propostas</span>
+                                            <span
+                                                class="sidebar-permission-dot {% if request.user.can_manage_propostas_definicoes %}allowed{% else %}denied{% endif %}"></span>
+                                        </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar">
+                        {% if request.user.is_authenticated %}
+                        {% if request.user.first_name %}
+                        {{ request.user.first_name|first|upper }}
+                        {% else %}
+                        {{ request.user.username|first|upper }}
+                        {% endif %}
+                        {% else %}
+                        ?
+                        {% endif %}
+                    </div>
+                    <div class="sidebar-user-info">
+                        <span class="sidebar-user-name">
+                            {% if request.user.is_authenticated %}
+                            {{ request.user.get_full_name|default:request.user.username }}
+                            {% else %}
+                            Visitante
+                            {% endif %}
+                        </span>
+                        <span class="sidebar-user-company">
+                            {% if request.user.is_authenticated and request.user.empresa %}
+                            {{ request.user.empresa.nome_fantasia }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'accounts:logout' %}" class="sidebar-logout">Sair</a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="sidebar-logout">Entrar</a>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="app-main">
+            <header class="app-main-header">
+                {% block header %}
+                <h1>Gestiospro</h1>
+                {% endblock %}
+            </header>
+
+            <section class="app-main-content">
+                <div class="page-container">
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="message message-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% block content %}{% endblock %}
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

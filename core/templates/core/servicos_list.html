@@ -1,0 +1,64 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Serviços{% endblock %}
+
+{% block header %}
+<h1>Serviços</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <div class="list-header">
+        <div>
+            <h2 class="list-title">Catálogo de serviços</h2>
+            <p class="list-subtitle">
+                Cadastre e gerencie os serviços oferecidos pela sua empresa.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'core:servicos_create' %}" class="btn btn-primary">
+                Novo serviço
+            </a>
+        </div>
+    </div>
+
+    {% if servicos %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th style="width: 120px;">Status</th>
+                <th style="width: 160px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servico in servicos %}
+            <tr>
+                <td>{{ servico.descricao }}</td>
+                <td>{{ servico.categoria|default:"-" }}</td>
+                <td>
+                    {% if servico.ativo %}
+                    <span class="status-pill status-pill-on">Ativo</span>
+                    {% else %}
+                    <span class="status-pill status-pill-off">Inativo</span>
+                    {% endif %}
+                </td>
+                <td class="table-actions">
+                    <a href="{% url 'core:servicos_update' servico.pk %}" class="btn btn-small btn-outline">
+                        Editar
+                    </a>
+                    <a href="{% url 'core:servicos_delete' servico.pk %}" class="btn btn-small btn-outline btn-danger">
+                        Remover
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">Nenhum serviço cadastrado ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

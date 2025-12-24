@@ -1,0 +1,103 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Usuários{% endblock %}
+
+{% block header %}
+<h1>Usuários</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <div class="list-header">
+        <div>
+            <h2 class="list-title">Lista de usuários</h2>
+            <p class="list-subtitle">
+                Gerencie os usuários que têm acesso ao sistema.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'core:usuarios_create' %}" class="btn btn-primary">
+                Novo usuário
+            </a>
+        </div>
+    </div>
+
+    {% if usuarios %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome / Login</th>
+                <th>E-mail</th>
+                <th>Tipo</th>
+                <th>Permissões</th>
+                <th>Status</th>
+                <th style="width: 160px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>
+                    {{ usuario.get_full_name|default:usuario.username }}
+                </td>
+                <td>{{ usuario.email }}</td>
+                <td>
+                    {% if usuario.user_type == "owner" %}
+                    Administrador / Proprietário
+                    {% else %}
+                    Usuário padrão
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="chip-group">
+                        {% if usuario.can_manage_contatos %}
+                        <span class="chip">Contatos</span>
+                        {% endif %}
+                        {% if usuario.can_manage_servicos %}
+                        <span class="chip">Serviços</span>
+                        {% endif %}
+                        {% if usuario.can_manage_definicoes %}
+                        <span class="chip">Definições</span>
+                        {% endif %}
+                        {% if usuario.can_manage_usuarios %}
+                        <span class="chip">Usuários</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    {% if usuario.is_active %}
+                    <span class="status-pill status-pill-on">Ativo</span>
+                    {% else %}
+                    <span class="status-pill status-pill-off">Inativo</span>
+                    {% endif %}
+                </td>
+                <td class="table-actions">
+                    {% with master=usuarios.0 %}
+                    {% if usuario.pk == master.pk %}
+                    {% if request.user.pk == master.pk %}
+                    <a href="{% url 'core:usuarios_update' usuario.pk %}" class="btn btn-small btn-outline">
+                        Editar
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <a href="{% url 'core:usuarios_update' usuario.pk %}" class="btn btn-small btn-outline">
+                        Editar
+                    </a>
+                    {% if request.user.pk != usuario.pk %}
+                    <a href="{% url 'core:usuarios_delete' usuario.pk %}" class="btn btn-small btn-outline btn-danger">
+                        Remover
+                    </a>
+                    {% endif %}
+                    {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">Nenhum usuário cadastrado ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

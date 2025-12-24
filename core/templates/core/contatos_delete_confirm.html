@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+
+{% block title %}Remover contato{% endblock %}
+
+{% block header %}
+<h1>Remover contato</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+    <p>Tem certeza que deseja remover o contato <strong>{{ contato.nome_fantasia }}</strong>?</p>
+
+    <form method="post" style="margin-top: 1rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="background: #ef4444; border-color: #ef4444;">
+            Sim, remover
+        </button>
+        <a href="{% url 'core:contatos_list' %}" class="btn btn-outline">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

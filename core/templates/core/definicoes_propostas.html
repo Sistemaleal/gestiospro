@@ -1,0 +1,517 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Definições de propostas{% endblock %}
+
+{% block header %}
+<h1>Definições de propostas</h1>
+<p class="text-muted">
+  Textos padrão de propostas e configurações gerais. Esses textos serão usados automaticamente nas propostas geradas pelo sistema.
+</p>
+{% endblock %}
+
+{% block content %}
+<div class="card card-page">
+
+  <form method="post" class="form-grid" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert-error">
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <!-- TEXTOS PADRÃO -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2 class="form-section-title">Textos padrão de propostas</h2>
+        <p class="form-section-help">
+          Esses textos serão usados automaticamente nas propostas geradas pelo sistema.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.exclusoes.id_for_label }}">Exclusões</label>
+        {{ form.exclusoes }}
+        {{ form.exclusoes.errors }}
+      </div>
+
+      <h3 style="margin-top:18px; font-size:1rem; font-weight:600;">Prazos</h3>
+      <p class="text-muted" style="margin-top:0;">
+        Prazo padrão que será exibido nas propostas para início e entrega dos serviços.
+      </p>
+
+      <div class="form-group">
+        <label for="{{ form.prazo_inicio.id_for_label }}">Prazo para início dos serviços</label>
+        {{ form.prazo_inicio }}
+        {{ form.prazo_inicio.errors }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.prazo_entrega.id_for_label }}">Prazo para entrega dos serviços</label>
+        {{ form.prazo_entrega }}
+        {{ form.prazo_entrega.errors }}
+      </div>
+
+      <div class="form-group" style="margin-top:18px;">
+        <label for="{{ form.declaracoes.id_for_label }}">Declarações</label>
+        {{ form.declaracoes }}
+        {{ form.declaracoes.errors }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.termo_confi.id_for_label }}">Termo de confidencialidade</label>
+        {{ form.termo_confi }}
+        {{ form.termo_confi.errors }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.agradecimentos.id_for_label }}">Agradecimentos / assinatura</label>
+        {{ form.agradecimentos }}
+        {{ form.agradecimentos.errors }}
+      </div>
+    </div>
+
+    {# ================================================================== #}
+    {# PAPEL TIMBRADO + MARGENS (SE QUISER OCULTAR, COLOQUE EM COMMENT)  #}
+    {# ================================================================== #}
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2 class="form-section-title">Papel timbrado</h2>
+        <p class="form-section-help">
+          Arquivo (PNG/JPG) que será usado como fundo nos PDFs das propostas.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Papel timbrado</label>
+        {% if form.instance.papel_timbrado %}
+          <p class="text-muted" style="margin-bottom:6px;">
+            Arquivo atual:
+            <a href="{{ form.instance.papel_timbrado.url }}" target="_blank">
+              ver papel timbrado
+            </a>
+          </p>
+        {% else %}
+          <p class="text-muted" style="margin-bottom:6px;">
+            Nenhum papel timbrado enviado ainda.
+          </p>
+        {% endif %}
+
+        {{ form.papel_timbrado }}
+        {{ form.papel_timbrado.errors }}
+
+        <p class="text-muted" style="margin-top:4px;">
+          Formatos: PNG/JPG. Recomenda-se um arquivo em alta resolução do tamanho de uma folha A4.
+        </p>
+
+        <div style="margin-top:6px;">
+          <label class="form-check">
+            <input type="checkbox" name="papel_timbrado_clear" id="id_papel_timbrado_clear">
+            <span>Remover papel timbrado atual</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section" style="padding-top: 1.25rem; border-top: 1px dashed var(--color-border); margin-top: 0.75rem;">
+        <div class="form-section-header">
+          <h3 class="form-section-title">Margens do texto no PDF (mm)</h3>
+          <p class="form-section-help">
+            Defina as margens internas onde o texto será impresso dentro do papel timbrado.
+          </p>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="{{ form.margem_superior.id_for_label }}">Margem superior (mm)</label>
+            {{ form.margem_superior }}
+            {{ form.margem_superior.errors }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.margem_inferior.id_for_label }}">Margem inferior (mm)</label>
+            {{ form.margem_inferior }}
+            {{ form.margem_inferior.errors }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.margem_esquerda.id_for_label }}">Margem esquerda (mm)</label>
+            {{ form.margem_esquerda }}
+            {{ form.margem_esquerda.errors }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.margem_direita.id_for_label }}">Margem direita (mm)</label>
+            {{ form.margem_direita }}
+            {{ form.margem_direita.errors }}
+          </div>
+        </div>
+
+        <p class="text-muted" style="margin-top: 4px;">
+          Valores padrão recomendados: superior/inferior 20&nbsp;mm; esquerda/direita 15&nbsp;mm.
+        </p>
+      </div>
+    </div>
+
+    <!-- NUMERAÇÃO AUTOMÁTICA SUPER SIMPLES -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2 class="form-section-title">Numeração automática de propostas</h2>
+        <p class="form-section-help">
+          Cada linha abaixo monta uma parte do número da proposta:
+          <strong>préfixo</strong> + <strong>parâmetro</strong> + <strong>sufixo</strong>.
+          O resultado final é a junção de todas as linhas na ordem.
+        </p>
+      </div>
+
+      <!-- Número inicial -->
+      <div class="form-group" style="max-width:260px;">
+        <label for="{{ form.numero_auto_iniciar.id_for_label }}">
+          Número automático iniciar a partir de
+        </label>
+        {{ form.numero_auto_iniciar }}
+        {{ form.numero_auto_iniciar.errors }}
+        <p class="text-muted" style="margin-top:4px;">
+          Ex.: 1000. Esse é o valor base do contador automático.
+        </p>
+      </div>
+
+      <!-- Tabela de montagem -->
+      <div class="na-right na-col">
+        <div class="na-montagem-header">
+          <div>
+            <h3 class="na-title">Montagem do código</h3>
+            <p class="na-help text-muted">
+              Use várias linhas se quiser. Exemplo:
+              linha 1 &rarr; "PRO_" + Mês (MM) + Ano (AAAA),
+              linha 2 &rarr; "" + Número automático + "".
+            </p>
+          </div>
+          <button type="button" id="na-add-linha" class="btn btn-small">
+            + Adicionar linha
+          </button>
+        </div>
+
+        <table class="na-table">
+          <thead>
+            <tr>
+              <th style="width: 30%;">Préfixo</th>
+              <th style="width: 30%;">Parâmetro</th>
+              <th style="width: 30%;">Sufixo</th>
+              <th style="width: 10%;"></th>
+            </tr>
+          </thead>
+          <tbody id="na-tbody">
+            {# Linhas criadas via JS #}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pré-visualização -->
+      <div class="na-preview">
+        <div class="na-preview-header">
+          <span>Pré-visualização do código</span>
+          <button type="button" id="na-btn-preview" class="btn btn-small btn-outline">
+            Atualizar exemplo
+          </button>
+        </div>
+        <div class="na-preview-body">
+          <div class="na-preview-label text-muted">
+            Exemplo usando o próximo número (simulado) e a data de hoje:
+          </div>
+          <div class="na-preview-code" id="na-preview-codigo">
+            — ainda sem configuração —
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden com a configuração em JSON (prefixo/param/sufixo) vindo do form -->
+      {{ form.numero_config_json }}
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        Salvar definições
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const tbody = document.getElementById("na-tbody");
+  const btnAddLinha = document.getElementById("na-add-linha");
+  const hiddenConfig = document.getElementById("id_numero_config_json");
+  const previewCodigo = document.getElementById("na-preview-codigo");
+  const btnPreview = document.getElementById("na-btn-preview");
+
+  function criarLinha(prefixo = "", param = "", sufixo = "") {
+    const tr = document.createElement("tr");
+    tr.classList.add("na-row");
+
+    const tdPrefixo = document.createElement("td");
+    const inputPrefixo = document.createElement("input");
+    inputPrefixo.type = "text";
+    inputPrefixo.className = "form-control na-input";
+    inputPrefixo.value = prefixo;
+    tdPrefixo.appendChild(inputPrefixo);
+
+    const tdParam = document.createElement("td");
+    const selectParam = document.createElement("select");
+    selectParam.className = "form-control na-select";
+    const optVazio = document.createElement("option");
+    optVazio.value = "";
+    optVazio.textContent = "— selecione —";
+    selectParam.appendChild(optVazio);
+
+    const params = [
+      { valor: "dia", label: "Dia (DD)" },
+      { valor: "mes", label: "Mês (MM)" },
+      { valor: "ano", label: "Ano (AAAA)" },
+      { valor: "horario", label: "Horário (HHMM)" },
+      { valor: "numero", label: "Número automático" },
+    ];
+    params.forEach(function (p) {
+      const opt = document.createElement("option");
+      opt.value = p.valor;
+      opt.textContent = p.label;
+      if (p.valor === param) opt.selected = true;
+      selectParam.appendChild(opt);
+    });
+    tdParam.appendChild(selectParam);
+
+    const tdSufixo = document.createElement("td");
+    const inputSufixo = document.createElement("input");
+    inputSufixo.type = "text";
+    inputSufixo.className = "form-control na-input";
+    inputSufixo.value = sufixo;
+    tdSufixo.appendChild(inputSufixo);
+
+    const tdAcoes = document.createElement("td");
+    tdAcoes.className = "na-actions-cell";
+    tdAcoes.innerHTML = `
+      <button type="button" class="na-row-up" title="Mover para cima">&#8593;</button>
+      <button type="button" class="na-row-down" title="Mover para baixo">&#8595;</button>
+      <button type="button" class="na-row-del" title="Remover">&#10005;</button>
+    `;
+
+    tr.appendChild(tdPrefixo);
+    tr.appendChild(tdParam);
+    tr.appendChild(tdSufixo);
+    tr.appendChild(tdAcoes);
+
+    tbody.appendChild(tr);
+  }
+
+  btnAddLinha.addEventListener("click", function () {
+    criarLinha("", "", "");
+    atualizarPreview();
+  });
+
+  tbody.addEventListener("click", function (e) {
+    const tr = e.target.closest("tr");
+    if (!tr) return;
+
+    if (e.target.classList.contains("na-row-up")) {
+      const prev = tr.previousElementSibling;
+      if (prev) tbody.insertBefore(tr, prev);
+      atualizarPreview();
+    } else if (e.target.classList.contains("na-row-down")) {
+      const next = tr.nextElementSibling;
+      if (next) tbody.insertBefore(next, tr);
+      atualizarPreview();
+    } else if (e.target.classList.contains("na-row-del")) {
+      tr.remove();
+      atualizarPreview();
+    }
+  });
+
+  function lerConfiguracao() {
+    const linhas = [];
+    tbody.querySelectorAll("tr").forEach(function (tr) {
+      const inputs = tr.querySelectorAll("input.na-input");
+      const select = tr.querySelector("select.na-select");
+      const prefixo = inputs[0] ? inputs[0].value : "";
+      const sufixo = inputs[1] ? inputs[1].value : "";
+      const param = select ? select.value : "";
+      if (!prefixo && !param && !sufixo) {
+        return;
+      }
+      linhas.push({
+        prefixo: prefixo || "",
+        param: param || "",
+        sufixo: sufixo || "",
+      });
+    });
+    return linhas;
+  }
+
+  function atualizarPreview() {
+    const cfg = lerConfiguracao();
+    hiddenConfig.value = JSON.stringify(cfg);
+
+    if (!cfg.length) {
+      previewCodigo.textContent = "— ainda sem configuração —";
+      return;
+    }
+
+    const agora = new Date();
+    const contexto = {
+      numero: "1100",
+      dia: String(agora.getDate()).padStart(2, "0"),
+      mes: String(agora.getMonth() + 1).padStart(2, "0"),
+      ano: String(agora.getFullYear()),
+      horario:
+        String(agora.getHours()).padStart(2, "0") +
+        String(agora.getMinutes()).padStart(2, "0"),
+    };
+
+    const partes = cfg.map(function (linha) {
+      const valorParam = linha.param ? (contexto[linha.param] || "") : "";
+      return (linha.prefixo || "") + valorParam + (linha.sufixo || "");
+    });
+
+    const codigo = partes.join("");
+    previewCodigo.textContent = codigo || "— ainda sem configuração —";
+  }
+
+  tbody.addEventListener("input", atualizarPreview);
+  tbody.addEventListener("change", atualizarPreview);
+
+  if (btnPreview) {
+    btnPreview.addEventListener("click", atualizarPreview);
+  }
+
+  // Carregar config existente do backend (se houver)
+  try {
+    const inicial = hiddenConfig.value;
+    if (inicial) {
+      const cfg = JSON.parse(inicial);
+      (cfg || []).forEach(function (linha) {
+        criarLinha(linha.prefixo || "", linha.param || "", linha.sufixo || "");
+      });
+    }
+  } catch (e) {
+    console.warn("Não foi possível carregar configuração de numeração:", e);
+  }
+
+  // Se não tiver nenhuma linha, cria uma pra ajudar
+  if (!tbody.querySelector("tr")) {
+    criarLinha("", "numero", "");
+  }
+
+  atualizarPreview();
+});
+</script>
+
+<style>
+.na-col {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  margin-top: 8px;
+}
+
+.na-montagem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.na-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.na-help {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.na-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.na-table th,
+.na-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 4px 4px;
+}
+
+.na-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.na-input,
+.na-select {
+  font-size: 0.78rem;
+  padding: 4px 6px;
+  height: 28px;
+}
+
+.na-actions-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.na-actions-cell button {
+  border: none;
+  background: #f3f4f6;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding: 2px 5px;
+  margin-left: 2px;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+.na-actions-cell button:hover {
+  background: #e5e7eb;
+}
+
+/* Preview */
+.na-preview {
+  margin-top: 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 10px 12px;
+}
+
+.na-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.84rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.na-preview-body {
+  font-size: 0.8rem;
+}
+
+.na-preview-code {
+  margin-top: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.85rem;
+  min-height: 26px;
+}
+</style>
+{% endblock %}

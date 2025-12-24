@@ -1,0 +1,345 @@
+{% load static %}
+{% load propostas_extras %} {# se quiser usar br_currency, senão remova #}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Proposta {{ proposta.numero }} - {{ empresa.nome_fantasia|default:empresa.razao_social }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+    .page {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 24px 24px 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-sizing: border-box;
+    }
+    .header-pdf {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 12px;
+    }
+    .header-esquerda {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1 1 60%;
+      min-width: 0;
+    }
+    .empresa-logo {
+      max-width: 80px;
+      max-height: 80px;
+      object-fit: contain;
+    }
+    .empresa-dados {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .empresa-dados p {
+      margin: 0 0 2px 0;
+      white-space: nowrap;
+    }
+    .empresa-nome {
+      font-weight: 700;
+      font-size: 15px;
+      margin: 0 0 4px 0;
+    }
+    .proposta-info {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.4;
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+    .proposta-numero {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    .conteudo-pdf {
+      box-sizing: border-box;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .proposta-publica-section {
+      margin-top: 18px;
+    }
+    .proposta-publica-section h2,
+    .proposta-publica-section h3,
+    .proposta-publica-section h4 {
+      margin: 0 0 6px 0;
+      text-transform: uppercase;
+    }
+    .proposta-publica-section h2 { font-size: 18px; }
+    .proposta-publica-section h3 { font-size: 16px; }
+    .proposta-publica-section h4 { font-size: 15px; }
+
+    .proposta-publica-section p {
+      margin: 0 0 8px 0;
+      white-space: pre-line;
+      text-align: justify;
+    }
+
+    .proposta-publica-tabela,
+    .proposta-publica-tabela th,
+    .proposta-publica-tabela td {
+      border: 1px solid #e5e7eb;
+      border-collapse: collapse;
+    }
+    .proposta-publica-tabela {
+      width: 100%;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    .proposta-publica-tabela th,
+    .proposta-publica-tabela td {
+      padding: 6px 8px;
+    }
+    .proposta-publica-tabela thead th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+    .right { text-align: right; }
+    .center { text-align: center; }
+
+    /* Ações do cliente */
+    .acoes-proposta {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .acoes-proposta h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      text-transform: none;
+    }
+    .acoes-proposta textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      resize: vertical;
+    }
+    .acoes-botoes {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn {
+      border: none;
+      border-radius: 4px;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-aprovar   { background-color: #16a34a; color: #ffffff; }
+    .btn-reprovar  { background-color: #dc2626; color: #ffffff; }
+    .btn-revisao   { background-color: #f97316; color: #ffffff; }
+
+    @media (max-width: 640px) {
+      .page { padding: 16px; }
+      .header-pdf { align-items: flex-start; }
+      .proposta-info { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Cabeçalho -->
+  <header class="header-pdf">
+    <div class="header-esquerda">
+      {% if empresa.logo %}
+      <img src="{{ empresa.logo.url }}"
+           alt="Logo {{ empresa.nome_fantasia|default:empresa.razao_social }}"
+           class="empresa-logo">
+      {% endif %}
+
+      <div class="empresa-dados">
+        <p class="empresa-nome">
+          {{ empresa.nome_fantasia|default:empresa.razao_social }}
+        </p>
+        {% if empresa.cnpj %}
+        <p>CNPJ: {{ empresa.cnpj }}</p>
+        {% endif %}
+        {% if empresa.telefone %}
+        <p>Tel.: {{ empresa.telefone }}</p>
+        {% endif %}
+        {% if empresa.email %}
+        <p>E-mail: {{ empresa.email }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="proposta-info">
+      <div class="proposta-numero">Proposta Nº {{ proposta.numero }}</div>
+      <div>
+        Data:
+        {% if proposta.data_servico %}
+          {{ proposta.data_servico|date:"d/m/Y" }}
+        {% else %}-{% endif %}
+      </div>
+      {% if proposta.validade %}
+      <div>
+        Validade: {{ proposta.validade|date:"d/m/Y" }}
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Corpo -->
+  <div class="conteudo-pdf">
+    <section class="proposta-publica-section">
+      <h2>{{ proposta.titulo_servico }}</h2>
+      <p><strong>Proposta Nº:</strong> {{ proposta.numero }}</p>
+      <p><strong>Cliente:</strong> {{ proposta.cliente }}</p>
+    </section>
+
+    <section class="proposta-publica-section">
+      <h3>1. Objetivo</h3>
+      <p>{{ proposta.objetivo_texto|default:"[Objetivo não informado]" }}</p>
+    </section>
+
+    <section class="proposta-publica-section">
+      <h3>2. Escopo do projeto</h3>
+      {{ proposta.escopo_texto|default:"[Escopo não informado]"|linebreaks }}
+    </section>
+
+    <section class="proposta-publica-section">
+      <h3>3. Exclusões</h3>
+      <p>{{ proposta.exclusos_texto|default:"[Exclusões não informadas]" }}</p>
+    </section>
+
+    <section class="proposta-publica-section">
+      <h3>4. Investimentos e forma de pagamento</h3>
+
+      <h4>4.1. Serviços e valores</h4>
+
+      {% if not proposta.exibir_apenas_total %}
+      <table class="proposta-publica-tabela">
+        <thead>
+          <tr>
+            <th>Serviço</th>
+            <th class="right">Valor (R$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if itens %}
+            {% for it in itens %}
+            <tr>
+              <td>{{ it.nome }}</td>
+              <td class="right">
+                {% if it.valor %}
+                  R$ {{ it.valor|br_currency }}
+                {% else %}-{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="2" class="center">Nenhum serviço cadastrado.</td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="right"><strong>Subtotal</strong></td>
+            <td class="right">R$ {{ proposta.subtotal|br_currency }}</td>
+          </tr>
+          {% if proposta.desconto_valor and proposta.desconto_valor > 0 %}
+          <tr>
+            <td class="right">Desconto</td>
+            <td class="right">- R$ {{ proposta.desconto_valor|br_currency }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td class="right"><strong>Total</strong></td>
+            <td class="right"><strong>R$ {{ proposta.total|br_currency }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+      {% else %}
+      <p>
+        Pela realização dos serviços descritos, o investimento total é de
+        <strong>R$ {{ proposta.total|br_currency }}</strong>.
+      </p>
+      {% endif %}
+
+      <h4>4.2. Texto de investimentos e forma de pagamento</h4>
+      <p>{{ proposta.investimentos_texto|default:"[Texto de investimentos não informado]" }}</p>
+    </section>
+
+    <section class="proposta-publica-section">
+      <h3>5. Prazos</h3>
+
+      <h4>5.1. Prazo para início dos serviços</h4>
+      <p>{{ proposta.prazo_inicio_texto|default:"[Prazo para início não informado]" }}</p>
+
+      <h4>5.2. Prazo para entrega dos serviços</h4>
+      <p>{{ proposta.prazo_entrega_texto|default:"[Prazo para entrega não informado]" }}</p>
+    </section>
+
+    <section class="proposta-publica-section">
+      <h3>6. Declarações</h3>
+      <p>{{ proposta.declaracoes_texto|default:"[Declarações não informadas]" }}</p>
+    </section>
+
+    <section class="proposta-publica-section">
+      <h3>7. Termo de confidencialidade</h3>
+      <p>{{ proposta.confidencialidade_texto|default:"[Termo de confidencialidade não informado]" }}</p>
+    </section>
+
+    <section class="proposta-publica-section">
+      <p>{{ proposta.assinatura_texto|default:"[Agradecimentos / assinatura não informados]" }}</p>
+    </section>
+
+    <!-- Ações do cliente -->
+    <section class="acoes-proposta">
+      <h3>O que você deseja fazer com esta proposta?</h3>
+
+      <form method="post" action="{% url 'propostas:proposta_public_responder' token=proposta.public_token %}">
+        {# CSRF é opcional aqui, você usou @csrf_exempt; se quiser, pode remover esta linha #}
+        {% csrf_token %}
+
+        <label for="id_mensagem">Observações (opcional):</label>
+        <textarea id="id_mensagem" name="mensagem"
+                  placeholder="Use este campo para justificar uma rejeição ou solicitar revisão."></textarea>
+
+        <div class="acoes-botoes">
+          <button type="submit" name="action" value="aprovar" class="btn btn-aprovar">
+            Aprovar proposta
+          </button>
+          <button type="submit" name="action" value="rejeitar" class="btn btn-reprovar">
+            Rejeitar
+          </button>
+          <button type="submit" name="action" value="revisao" class="btn btn-revisao">
+            Pedir revisão
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+</div>
+</body>
+</html>
