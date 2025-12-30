@@ -3,6 +3,10 @@
 
 {% block title %}Definições da empresa{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/configuracoes.css' %}">
+{% endblock %}
+
 {% block header %}
 <h1>Definições da empresa</h1>
 {% endblock %}
@@ -24,13 +28,13 @@
             <div class="form-grid-2">
                 <div class="form-group floating">
                     {{ form.nome_fantasia }}
-                    <label>Nome fantasia</label>
+                    <label for="{{ form.nome_fantasia.id_for_label }}">Nome fantasia</label>
                     {{ form.nome_fantasia.errors }}
                 </div>
 
                 <div class="form-group floating">
                     {{ form.razao_social }}
-                    <label>Razão social</label>
+                    <label for="{{ form.razao_social.id_for_label }}">Razão social</label>
                     {{ form.razao_social.errors }}
                 </div>
 
@@ -46,20 +50,20 @@
 
                 <div class="form-group floating">
                     {{ form.telefone }}
-                    <label>Telefone</label>
+                    <label for="{{ form.telefone.id_for_label }}">Telefone</label>
                     {{ form.telefone.errors }}
                 </div>
 
                 <div class="form-group floating">
                     {{ form.email }}
-                    <label>E‑mail</label>
+                    <label for="{{ form.email.id_for_label }}">E‑mail</label>
                     {{ form.email.errors }}
                 </div>
 
                 <!-- CEP com botão de busca -->
                 <div class="form-group floating with-addon">
                     {{ form.cep }}
-                    <label>CEP</label>
+                    <label for="{{ form.cep.id_for_label }}">CEP</label>
                     <button type="button" class="input-addon" id="btn-buscar-cep">
                         Buscar CEP
                     </button>
@@ -80,25 +84,25 @@
             <div class="form-grid-3">
                 <div class="form-group floating">
                     {{ form.logradouro }}
-                    <label>Logradouro</label>
+                    <label for="{{ form.logradouro.id_for_label }}">Logradouro</label>
                     {{ form.logradouro.errors }}
                 </div>
 
                 <div class="form-group floating">
                     {{ form.numero }}
-                    <label>Número</label>
+                    <label for="{{ form.numero.id_for_label }}">Número</label>
                     {{ form.numero.errors }}
                 </div>
 
                 <div class="form-group floating">
                     {{ form.bairro }}
-                    <label>Bairro</label>
+                    <label for="{{ form.bairro.id_for_label }}">Bairro</label>
                     {{ form.bairro.errors }}
                 </div>
 
                 <div class="form-group floating">
                     {{ form.cidade }}
-                    <label>Cidade</label>
+                    <label for="{{ form.cidade.id_for_label }}">Cidade</label>
                     {{ form.cidade.errors }}
                 </div>
 
@@ -110,7 +114,7 @@
 
                 <div class="form-group floating" style="grid-column: 1 / -1;">
                     {{ form.complemento }}
-                    <label>Complemento</label>
+                    <label for="{{ form.complemento.id_for_label }}">Complemento</label>
                     {{ form.complemento.errors }}
                 </div>
             </div>
@@ -131,7 +135,7 @@
                     <label class="form-label">Logo da empresa</label>
 
                     {% if form.instance.logo %}
-                        <!-- Opcional: botão ver logo -->
+                        <!-- Botão ver logo -->
                         <button type="button"
                                 id="btn-ver-logo"
                                 class="btn btn-small btn-outline"
@@ -145,7 +149,6 @@
                         </p>
                     {% endif %}
 
-                    <!-- Apenas o input de arquivo, sem textos padrão -->
                     <div>
                         {{ form.logo }}
                         {{ form.logo.errors }}
@@ -156,7 +159,7 @@
                     </p>
                 </div>
 
-                <!-- Direita: pré‑visualização + botão Remover logo (o que você já usa) -->
+                <!-- Direita: pré‑visualização + botão Remover logo -->
                 <div class="form-group">
                     <label class="form-label">Pré‑visualização</label>
 
@@ -192,7 +195,6 @@
                 </div>
             </div>
 
-            <!-- Checkbox oculto que o backend usa para limpar a logo -->
             <input type="checkbox" name="logo-clear" id="id_logo_clear" style="display:none;">
         </div>
 

@@ -1,89 +1,111 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <title>Gestiospro - Cadastro de Empresa</title>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/accounts_login.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
-<body class="login-body">
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="login-logo">
-                    <img src="{% static 'img/logo-gestiospro.png' %}" alt="Gestiospro" class="login-logo-img">
-                </div>
-                <h1>Cadastrar empresa</h1>
-                <p class="login-subtitle">
-                    Crie a conta da sua empresa para começar a usar o Gestiospro.
-                </p>
+<body class="login-split-body">
+    <div class="login-split-container">
+        <!-- Lado Esquerdo -->
+        <div class="login-split-left">
+            <div class="login-welcome-icons">
+                <svg width="32" height="32" class="icon-bg" fill="none" stroke="#fff" stroke-width="2">
+                    <circle cx="16" cy="12" r="5"/>
+                    <path d="M5 27c0-4.2 9-6.5 11-6.5S27 22.8 27 27"/>
+                </svg>
+                <svg width="32" height="32" class="icon-bg" fill="none" stroke="#fff" stroke-width="2">
+                    <rect x="6" y="12" width="20" height="14" rx="3"/>
+                    <path d="M6 16h20"/>
+                </svg>
+                <svg width="32" height="32" class="icon-bg" fill="none" stroke="#fff" stroke-width="2">
+                    <path d="M21 2l7 7-5 5-7-7 5-5z"/>
+                    <path d="M18 9L9 18"/>
+                    <circle cx="9" cy="18" r="2"/>
+                    <circle cx="18" cy="9" r="2"/>
+                </svg>
             </div>
-
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message message-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
+            <div class="login-welcome">
+                <h2>Crie sua empresa no Gestiospro</h2>
+                <p>A solução descomplicada para gestão de projetos e contratos.<br>Cadastre sua empresa e ganhe produtividade!</p>
             </div>
-            {% endif %}
-
-            <form method="post" class="login-form">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="id_nome_fantasia">Nome Cliente / Nome fantasia *</label>
-                    <input type="text" id="id_nome_fantasia" name="nome_fantasia" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_telefone">Telefone</label>
-                    <input type="text" id="id_telefone" name="telefone" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="id_email">E-mail</label>
-                    <input type="email" id="id_email" name="email" class="form-control">
-                </div>
-
-                <hr>
-
-                <div class="form-group">
-                    <label for="id_username">Nome de usuário *</label>
-                    <input type="text" id="id_username" name="username" class="form-control" required>
-                </div>
-
-                <div class="form-group password-group">
-                    <label for="id_senha">Senha *</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="id_senha" name="senha" class="form-control" required>
-                        <button type="button" class="password-toggle" onclick="togglePassword('id_senha', this)">
-                            Mostrar
-                        </button>
+        </div>
+        <!-- Lado Direito -->
+        <div class="login-split-right">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <img src="{% static 'img/logo-gestiospro.png' %}" alt="Gestiospro" class="login-logo-img">
                     </div>
+                    <h1>Cadastrar Empresa</h1>
+                    <p class="login-subtitle">
+                        Crie a conta da sua empresa para começar a usar o Gestiospro.
+                    </p>
                 </div>
-
-                <div class="form-group password-group">
-                    <label for="id_senha2">Confirmar senha *</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="id_senha2" name="senha2" class="form-control" required>
-                        <button type="button" class="password-toggle" onclick="togglePassword('id_senha2', this)">
-                            Mostrar
-                        </button>
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message message-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <form method="post" class="login-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_nome_fantasia">Nome Cliente / Nome fantasia *</label>
+                        <input type="text" id="id_nome_fantasia" name="nome_fantasia" class="form-control" required>
                     </div>
+                    <div class="form-group">
+                        <label for="id_telefone">Telefone</label>
+                        <input type="text" id="id_telefone" name="telefone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="id_email">E-mail</label>
+                        <input type="email" id="id_email" name="email" class="form-control">
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="id_username">Nome de usuário *</label>
+                        <input type="text" id="id_username" name="username" class="form-control" required>
+                    </div>
+                    <div class="form-group password-group">
+                        <label for="id_senha">Senha *</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="id_senha" name="senha" class="form-control" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('id_senha', this)">
+                                <svg class="icon-eye" width="20" height="20" fill="none" stroke="#888" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 10s4-7 9-7 9 7 9 7-4 7-9 7-9-7-9-7z" />
+                                    <circle cx="10" cy="10" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group password-group">
+                        <label for="id_senha2">Confirmar senha *</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="id_senha2" name="senha2" class="form-control" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('id_senha2', this)">
+                                <svg class="icon-eye" width="20" height="20" fill="none" stroke="#888" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 10s4-7 9-7 9 7 9 7-4 7-9 7-9-7-9-7z" />
+                                    <circle cx="10" cy="10" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Criar empresa e usuário</button>
+                </form>
+                <div class="login-footer">
+                    <span>Já tem empresa cadastrada?</span>
+                    <a href="{% url 'accounts:login' %}" class="footer-link-primary">Voltar para o login</a>
                 </div>
-
-                <button type="submit" class="btn btn-primary btn-block">Criar empresa e usuário</button>
-            </form>
-
-            <div class="login-footer">
-                <span>Já tem empresa cadastrada?</span>
-                <a href="{% url 'accounts:login' %}">Voltar para o login</a>
             </div>
         </div>
     </div>
-
     <script src="{% static 'js/main.js' %}"></script>
 </body>
-
 </html>

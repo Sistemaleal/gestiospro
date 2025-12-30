@@ -1,0 +1,296 @@
+:root {
+    --cor-primary: #5271FF;
+    --cor-primary-light: #eaf0ff;
+    --cor-border: #dfe4ef;
+    --cor-bg-card: #fff;
+    --cor-bg-section: #f7faff;
+    --cor-bg-muted: #f3f6fa;
+    --cor-muted: #8491ab;
+    --cor-label: #4e5e7f;
+    --cor-error: #ef4444;
+    --radius: 1rem;
+    --shadow: 0 8px 24px rgba(70, 90, 180, 0.09);
+}
+
+/* Card principal */
+.card.card-page {
+    background: var(--cor-bg-card);
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+    border: 1px solid var(--cor-border);
+    padding: 2.3rem 2rem 2rem 2rem;
+    margin: 0 auto 3rem;
+    max-width: 930px;
+}
+
+/* Título e subtítulo da página */
+.app-main-header h1 {
+    color: var(--cor-primary);
+    font-size: 1.57rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+}
+
+.form-section-header h2 {
+    color: #23273e;
+    font-size: 1.16rem;
+    font-weight: 600;
+    margin-bottom: .1rem;
+}
+
+.form-section-help {
+    color: var(--cor-muted);
+    font-size: 0.97rem;
+    margin-bottom: .6rem;
+}
+
+/* Seções do formulário */
+.form-section {
+    background: var(--cor-bg-section);
+    border-radius: .7rem;
+    padding: 1.4rem 1rem 1.1rem 1rem;
+    margin-bottom: 2.1rem;
+    border: 1px solid var(--cor-border);
+}
+
+.form-section-header {
+    margin-bottom: 1.1rem;
+}
+
+/* Grids para campos */
+.form-grid,
+.form-grid-2,
+.form-grid-3 {
+    gap: 1.1rem 1.2rem;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+/* Campos flutuantes modernos */
+.form-group.floating {
+    position: relative;
+    margin-bottom: 0.6rem;
+}
+
+.form-group.floating input,
+.form-group.floating select,
+.form-group.floating textarea {
+    padding: 0.8rem 0.95rem 0.6rem 0.9rem;
+    border-radius: 0.45rem;
+    border: 1.5px solid var(--cor-border);
+    background: #fff;
+    font-size: 1rem;
+    color: #334155;
+    transition: border-color .17s, box-shadow .13s, background .14s;
+    box-shadow: none;
+}
+
+.form-group.floating input:focus,
+.form-group.floating textarea:focus,
+.form-group.floating select:focus {
+    border-color: var(--cor-primary);
+    background: var(--cor-primary-light);
+    outline: none;
+}
+
+.form-group.floating label {
+    position: absolute;
+    left: 1rem;
+    top: 0.88rem;
+    font-size: 0.96rem;
+    color: var(--cor-label);
+    background-color: transparent;
+    pointer-events: none;
+    transition: all 0.13s;
+    font-weight: 500;
+    letter-spacing: .01em;
+}
+
+.form-group.floating input:not(:placeholder-shown)+label,
+.form-group.floating input:focus+label,
+.form-group.floating textarea:not(:placeholder-shown)+label,
+.form-group.floating textarea:focus+label {
+    top: -0.88rem;
+    left: 0.82rem;
+    font-size: 0.835rem;
+    color: var(--cor-primary);
+    background: var(--cor-bg-card);
+    padding: 0 0.4rem;
+}
+
+/* Select (ex: UF) */
+.select-group select {
+    width: 100%;
+    padding: 0.8rem 0.8rem;
+    border-radius: 0.45rem;
+    border: 1.5px solid var(--cor-border);
+    background: #fff;
+    font-size: 1rem;
+    color: #334155;
+}
+
+.select-group label {
+    font-size: 1.01rem;
+    font-weight: 500;
+    color: var(--cor-label);
+    margin-bottom: .3rem;
+}
+
+/* Input com addon */
+.form-group.with-addon {
+    position: relative;
+}
+
+.input-addon {
+    position: absolute;
+    right: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.37rem 0.82rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--cor-primary);
+    background-color: #fbfdff;
+    color: var(--cor-primary);
+    font-size: 0.93rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background .13s, border .14s;
+    box-shadow: none;
+}
+
+.input-addon:hover {
+    background: var(--cor-primary-light);
+}
+
+/* Error msg */
+.form-group .errorlist,
+.form-group .errorlist li {
+    color: var(--cor-error);
+    font-size: 0.95rem;
+    margin: 0.3rem 0 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.form-group input:invalid,
+.form-group textarea:invalid,
+.form-group select:invalid {
+    border-color: var(--cor-error);
+}
+
+/* Logo upload + preview */
+.logo-preview-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.logo-preview-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f3f6fb, #eaf0ff);
+    box-shadow: 0 7px 20px rgba(70, 90, 180, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5271FF;
+    font-weight: 600;
+    font-size: 31px;
+    overflow: hidden;
+}
+
+.logo-preview-avatar img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 13px;
+    display: block;
+}
+
+.logo-preview-placeholder {
+    display: block;
+    color: #9db2d2;
+    font-size: 1.7rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+}
+
+.logo-preview-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.logo-preview-text {
+    font-size: 0.98rem;
+    color: var(--cor-muted);
+}
+
+.btn,
+.btn-small,
+.btn-primary,
+.btn-outline {
+    font-family: inherit;
+    box-shadow: none;
+}
+
+.btn-small {
+    font-size: 0.92rem;
+    padding: 0.32rem 0.89rem;
+}
+
+.btn-primary {
+    background: linear-gradient(96deg, #5271FF 50%, #45ecb4 100%);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+}
+
+.btn-outline {
+    background: none;
+    color: var(--cor-primary);
+    border: 1.5px solid var(--cor-primary);
+}
+
+.btn-primary:hover,
+.btn-outline:hover {
+    filter: brightness(1.075);
+}
+
+/* Ações do formulário */
+.form-actions {
+    display: flex;
+    gap: 1.05rem;
+    margin-top: 1.6rem;
+    justify-content: flex-end;
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+    .card.card-page {
+        padding: 1.1rem 1rem 1rem 1rem;
+    }
+
+    .logo-preview-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .logo-preview-avatar {
+        margin-bottom: 1.4rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .card.card-page {
+        padding: 0.8rem 0.3rem;
+    }
+
+    .form-section {
+        padding: 1.1rem 0.4rem;
+    }
+}

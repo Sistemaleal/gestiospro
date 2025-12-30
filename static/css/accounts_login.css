@@ -1,0 +1,267 @@
+:root {
+    --color-primary: #5271FF;
+    --color-green: #29DB95;
+    --color-grey-light: #F5F6FA;
+    --color-bg-left: #2dc1a6;
+    /* Sinta-se livre para ajustar este tom. */
+    --font-family-main: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Layout Split */
+.login-split-body {
+    min-height: 100vh;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background: var(--color-grey-light);
+    font-family: var(--font-family-main);
+}
+
+.login-split-container {
+    width: 100vw;
+    max-width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+}
+
+/* Lado esquerdo */
+.login-split-left {
+    flex: 1.1;
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 18px;
+    box-shadow: 0 0 16px rgba(82, 113, 255, 0.035);
+}
+
+.login-welcome {
+    max-width: 340px;
+    text-align: center;
+}
+
+.login-welcome h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.login-welcome p {
+    font-size: 1.1rem;
+    opacity: 0.88;
+}
+
+.login-welcome .btn {
+    margin-top: 1.6rem;
+    background: transparent;
+    border: 1.5px solid #fff;
+    color: #fff;
+    font-size: 1.08rem;
+    padding: 11px 0;
+    border-radius: 25px;
+    width: 70%;
+    transition: background .2s, color .2s;
+}
+
+.login-welcome .btn:hover {
+    background: #fff;
+    color: var(--color-primary);
+}
+
+/* Lado direito */
+.login-split-right {
+    flex: 1;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background: #fff;
+    padding: 38px 30px;
+    margin: 40px 0;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(82, 113, 255, 0.09);
+    max-width: 400px;
+    width: 99%;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.6rem;
+}
+
+.login-logo-img {
+    width: 200px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 1.1rem;
+}
+
+.login-header h1 {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.6rem;
+}
+
+.login-subtitle {
+    color: #888;
+    font-size: 1.02rem;
+}
+
+.form-group {
+    margin-bottom: 17px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 11px 13px;
+    font-size: 1.04rem;
+    border: 1px solid #d7dae2;
+    border-radius: 7px;
+    background: #f6f7fb;
+    transition: border .2s;
+}
+
+.form-control:focus {
+    border-color: var(--color-primary);
+    outline: none;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--color-primary), var(--color-green));
+    border: none;
+    border-radius: 7px;
+    color: #fff;
+    /* igual input */
+    padding: 13px 0;
+    width: 100%;
+    font-size: 1.08rem;
+    font-weight: 600;
+    margin-top: 10px;
+    box-shadow: 0 3px 12px rgba(41, 219, 149, 0.11);
+    transition: filter .14s;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.06);
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 1.3rem;
+    font-size: 0.97rem;
+}
+
+.login-footer a {
+    color: var(--color-green);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsividade MÓVEL */
+@media (max-width: 950px) {
+    .login-split-left {
+        display: none;
+    }
+
+    .login-split-right {
+        flex: 1 1 100%;
+    }
+
+    .login-card {
+        margin: 0;
+    }
+
+    .login-split-container {
+        min-height: 100vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 15px 8px;
+        max-width: 98vw;
+    }
+
+    .login-logo-img {
+        width: 70px;
+    }
+}
+
+.password-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.form-control[type="password"] {
+    padding-right: 45px;
+    /* espaço pro botão */
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 54%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 3px;
+    cursor: pointer;
+    color: var(--color-primary);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    transition: background 0.12s;
+}
+
+.password-toggle:hover {
+    background: #f5f6fa;
+}
+
+.icon-eye {
+    stroke: #888;
+    transition: stroke .18s;
+}
+
+.password-toggle:hover .icon-eye {
+    stroke: var(--color-primary);
+}
+
+.footer-link-primary {
+    color: var(--color-primary) !important;
+    font-weight: 600;
+    text-decoration: none;
+    transition: text-decoration .13s;
+}
+
+.footer-link-primary:hover {
+    text-decoration: underline;
+}
+
+.login-welcome-icons {
+    display: flex;
+    gap: 21px;
+    justify-content: center;
+    margin-bottom: 1.7rem;
+}
+
+.icon-bg {
+    opacity: 0.85;
+}
