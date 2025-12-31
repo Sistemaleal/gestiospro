@@ -229,3 +229,21 @@ class PropostaConfiguracaoForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+# =========================================================
+# USUÁRIOS
+# =========================================================
+
+class UserForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "user_type",
+            "can_manage_contatos",
+            "can_manage_servicos",
+            "can_manage_usuarios",
+            "can_manage_propostas",
+            "can_manage_propostas_definicoes",
+        ]

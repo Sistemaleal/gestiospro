@@ -11,7 +11,9 @@ from .forms import (
     ServicoForm,
     EmpresaForm,
     PropostaConfiguracaoForm,
+    UserForm,  # ← ADICIONE ISTO
 )
+
 from .models import (
     Contato,
     Servico,
