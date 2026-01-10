@@ -1,29 +1,90 @@
 :root {
     --color-primary: #5271FF;
     --color-primary-light: #eaf0ff;
+
+    --sidebar-width: 260px;
+    --topbar-height: 56px;
+
+    --sidebar-border: #eff2f6;
+    --sidebar-divider: rgba(15, 23, 42, 0.08);
+    --sidebar-subdivider: rgba(15, 23, 42, 0.06);
+
+    --topbar-bg: #ffffff;
+    --topbar-text: #111827;
 }
+
+/* =========================
+   DESKTOP LAYOUT (>= 1021px)
+   - Sidebar fixo
+   - Conteúdo com margem
+========================= */
 
 .sidebar {
     background: #fff;
     color: #222;
-    width: 260px;
-    min-width: 260px;
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+
     height: 100vh;
-    position: relative;
+    position: fixed;
+    /* FIXO */
+    top: 0;
+    left: 0;
+
     z-index: 120;
     box-shadow: 1px 0 8px rgba(44, 55, 130, .03);
-    transition: left .2s, width .2s;
-    left: 0;
+
     display: flex;
     flex-direction: column;
+
+    /* scroll interno do menu */
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
+
+.app-main {
+    margin-left: var(--sidebar-width);
+    /* abre espaço pro sidebar */
+}
+
+/* Topbar é SOMENTE mobile */
+.mobile-topbar {
+    display: none;
+}
+
+/* Overlay e close só mobile */
+.sidebar-close,
+.sidebar-overlay {
+    display: none;
+}
+
+/* Não usar mais hamburger antigo (para evitar conflito) */
+.sidebar-hamburger {
+    display: none !important;
+}
+
+/* =========================
+   HEADER / BRAND
+========================= */
 
 .sidebar-header {
     display: flex;
     align-items: center;
     gap: 0.9rem;
-    padding: 1.1rem 1.4rem 1.1rem 1.4rem;
+    padding: 1.1rem 1.4rem;
     position: relative;
+    border-bottom: 1px solid var(--sidebar-border);
+}
+
+/* Se você não tiver .sidebar-brand no HTML, pode ignorar */
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
 }
 
 .sidebar-logo-img-wrapper {
@@ -35,6 +96,7 @@
     background: #f4f6fa;
     border-radius: 8px;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .sidebar-logo-img {
@@ -48,45 +110,83 @@
 .sidebar-logo-text {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .sidebar-title {
     font-weight: 700;
     font-size: 1.11rem;
     color: var(--color-primary);
+    line-height: 1.1;
 }
 
 .sidebar-subtitle {
     font-size: 0.81rem;
     color: #8ca0b9;
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+/* =========================
+   SECTIONS / DIVIDERS
+========================= */
+
+.sidebar-section-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    margin: 14px 20px 6px;
+}
+
+.sidebar-divider {
+    height: 1px;
+    background: var(--sidebar-divider);
+    margin: 12px 14px;
+}
+
+.sidebar-subdivider {
+    height: 1px;
+    background: var(--sidebar-subdivider);
+    margin: 8px 0 10px;
+}
+
+/* =========================
+   MENU
+========================= */
 
 .sidebar-menu {
     flex: 1;
-    padding: 0.5rem 0 0 0;
+    padding: 0.35rem 0 0.75rem;
 }
 
 .sidebar-main-section {
-    margin-bottom: .8rem;
+    margin-bottom: .55rem;
 }
 
 .sidebar-item,
 .sidebar-accordion-toggle {
     background: none;
     border: none;
-    width: 100%;
+
+    width: calc(100% - 20px);
+    margin: 0 10px;
+
     display: flex;
     align-items: center;
     color: #23273e;
     font-weight: 500;
     cursor: pointer;
     font-size: 1rem;
-    padding: 10px 20px 10px 20px;
+    padding: 10px 14px;
     border-radius: 10px;
     transition: background .15s, color .15s;
     position: relative;
     gap: 14px;
+
+    text-decoration: none;
 }
 
 .sidebar-item .sidebar-item-icon,
@@ -97,6 +197,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Força SVG a acompanhar currentColor */
+.sidebar-item svg,
+.sidebar-accordion-toggle svg {
+    stroke: currentColor;
 }
 
 .sidebar-item.selected,
@@ -203,10 +310,14 @@
     letter-spacing: 0.01em;
 }
 
+/* =========================
+   FOOTER
+========================= */
+
 .sidebar-footer {
-    padding: 1.25rem 1.38rem .6rem 1.38rem;
-    border-top: 1px solid #eff2f6;
-    margin-top: 0.8rem;
+    padding: 1.05rem 1.38rem .7rem 1.38rem;
+    border-top: 1px solid var(--sidebar-border);
+    margin-top: 0.6rem;
 }
 
 .sidebar-user {
@@ -217,9 +328,13 @@
 }
 
 .sidebar-user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 99px;
+    width: 40px;
+    /* pode manter 32px se quiser */
+    height: 40px;
+    /* importante ter height */
+    border-radius: 999px;
+    overflow: hidden;
+    /* ISSO corta a imagem dentro do círculo */
     background: #eef2ff;
     color: #5271FF;
     font-weight: 700;
@@ -227,22 +342,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    /* evita esticar */
 }
 
 .sidebar-user-info {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .sidebar-user-name {
     font-size: 0.94rem;
     font-weight: 600;
     color: #23273e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-user-company {
     font-size: 0.8rem;
     color: #b8bbc9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-logout {
@@ -254,10 +378,10 @@
     align-items: center;
     gap: 5px;
     text-decoration: none;
-    padding: 8px 0px 8px 0;
+    padding: 8px 10px;
     background: none;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     transition: background 0.13s, color 0.11s;
     cursor: pointer;
 }
@@ -267,20 +391,76 @@
     color: #5271FF;
 }
 
-/* --- OCULTAR HAMBURGUER E X DE FECHAR NO DESKTOP --- */
-.sidebar-hamburger,
-.sidebar-close,
-.sidebar-overlay {
-    display: none;
+.sidebar-user-logo {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    /* corta e preenche bonito */
 }
 
+/* =========================
+   MOBILE (<= 1020px)
+   - topbar fixa no topo
+   - sidebar vira drawer lateral
+========================= */
+
 @media (max-width: 1020px) {
-    .sidebar {
-        position: fixed;
-        left: -260px;
+
+    /* Topbar aparece */
+    .mobile-topbar {
+        display: flex;
+        position: sticky;
         top: 0;
-        bottom: 0;
-        height: 100vh;
+        z-index: 170;
+        height: var(--topbar-height);
+        padding: 0 14px;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--topbar-bg);
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .mobile-topbar-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--topbar-text);
+        font-weight: 800;
+        min-width: 0;
+    }
+
+    .mobile-topbar-logo {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+    }
+
+    .mobile-topbar-title {
+        font-size: 1.02rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mobile-topbar-hamburger {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: var(--topbar-text);
+        padding: 8px;
+        border-radius: 10px;
+        line-height: 0;
+    }
+
+    .mobile-topbar-hamburger:hover {
+        background: rgba(15, 23, 42, 0.06);
+    }
+
+    /* Sidebar vira drawer (não fica ocupando o desktop) */
+    .sidebar {
+        left: -105%;
         width: 90vw;
         min-width: 0;
         max-width: 370px;
@@ -292,46 +472,31 @@
         left: 0;
     }
 
-    .sidebar-hamburger {
-        display: block;
-        position: fixed;
-        top: 18px;
-        left: 18px;
-        background: #fff;
-        border: none;
-        z-index: 170;
-        padding: 7px 9px;
-        border-radius: 7px;
-        box-shadow: 0 2px 8px #d0daec36;
-    }
-
-    .sidebar.sidebar-open~.sidebar-hamburger {
-        display: none !important;
+    /* Close botão só mobile */
+    .sidebar-close {
+        display: none;
     }
 
     .sidebar.sidebar-open .sidebar-close {
         display: block !important;
         position: absolute;
-        right: 18px;
-        top: 16px;
+        right: 14px;
+        top: 12px;
         z-index: 200;
-        background: none;
-        border: none;
+        background: #ffffff;
+        border: 1px solid rgba(15, 23, 42, 0.10);
         padding: 7px;
+        border-radius: 10px;
+        color: #111;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
     }
 
-    .sidebar-close {
-        display: none;
-    }
-
+    /* Overlay */
     .sidebar-overlay {
         display: none;
         position: fixed;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(30, 30, 53, 0.16);
+        inset: 0;
+        background: rgba(2, 6, 23, 0.35);
         z-index: 115;
         transition: opacity .15s;
     }
@@ -340,10 +505,8 @@
         display: block;
     }
 
-    .app-body,
-    .app-main,
-    .app-main-header,
-    .app-main-content {
+    /* No mobile o main não tem margem esquerda */
+    .app-main {
         margin-left: 0 !important;
     }
 }
