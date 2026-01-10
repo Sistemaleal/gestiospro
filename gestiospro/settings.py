@@ -119,7 +119,15 @@ if USE_S3:
     AWS_QUERYSTRING_AUTH = False
 
     # Storage padrão para uploads
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    # Django 5+ (recomendado): configura o storage padrão via STORAGES
+    STORAGES = {
+        "default": {"BACKEND": "storages.backends.s3.S3Storage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
+
+    # (Opcional mas recomendado para evitar AccessDenied em objetos)
+    AWS_DEFAULT_ACL = "public-read"
+    AWS_QUERYSTRING_AUTH = False
 
     # URLs públicas dos arquivos
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
