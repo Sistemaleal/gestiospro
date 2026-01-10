@@ -1,0 +1,15 @@
+# Django / Python
+__pycache__/
+*.pyc
+
+# Ambiente
+.env
+
+# Banco local (NÃO versionar)
+db.sqlite3
+
+# Uploads (NÃO versionar)
+media/
+
+# Resultado do collectstatic (NÃO versionar)
+staticfiles/
