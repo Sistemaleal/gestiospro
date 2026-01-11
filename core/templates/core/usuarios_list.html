@@ -4,100 +4,136 @@
 {% block title %}Usuários{% endblock %}
 
 {% block header %}
-<h1>Usuários</h1>
+<div class="page-header">
+  <div class="page-header__title">
+    <h1>Usuários</h1>
+    <p class="text-muted">Gerencie os usuários que têm acesso ao sistema.</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="card card-page">
-    <div class="list-header">
-        <div>
-            <h2 class="list-title">Lista de usuários</h2>
-            <p class="list-subtitle">
-                Gerencie os usuários que têm acesso ao sistema.
-            </p>
-        </div>
-        <div>
-            <a href="{% url 'core:usuarios_create' %}" class="btn btn-primary">
-                Novo usuário
-            </a>
-        </div>
+<div class="card card-page card-list-clean">
+  <div class="listbar">
+    <div class="listbar__left">
+      <h2 class="listbar__title">Lista de usuários</h2>
+      <p class="listbar__subtitle text-muted">Pesquise, filtre e controle permissões.</p>
     </div>
 
-    {% if usuarios %}
-    <table class="table">
+    <div class="listbar__right">
+      <a href="{% url 'core:usuarios_create' %}" class="btn btn-primary">Novo usuário</a>
+    </div>
+  </div>
+
+  <!-- Filtros (UI clean; backend pode ligar via GET depois) -->
+  <form class="filters-clean" method="get" autocomplete="off">
+    <div class="filters-clean__row filters-clean__row--users">
+      <div class="filters-clean__search">
+        <input name="q" type="text" placeholder="Buscar por nome, login ou e-mail..." value="{{ request.GET.q }}">
+      </div>
+
+      <select name="tipo" aria-label="Tipo">
+        <option value="" {% if not request.GET.tipo %}selected{% endif %}>Tipo: Todos</option>
+        <option value="owner" {% if request.GET.tipo == "owner" %}selected{% endif %}>Administrador</option>
+        <option value="padrao" {% if request.GET.tipo == "padrao" %}selected{% endif %}>Usuário padrão</option>
+      </select>
+
+      <select name="status" aria-label="Status">
+        <option value="" {% if not request.GET.status %}selected{% endif %}>Status: Todos</option>
+        <option value="ativo" {% if request.GET.status == "ativo" %}selected{% endif %}>Ativo</option>
+        <option value="inativo" {% if request.GET.status == "inativo" %}selected{% endif %}>Inativo</option>
+      </select>
+
+      <button class="btn btn-outline" type="submit">Filtrar</button>
+      <a class="btn btn-outline" href="{% url 'core:usuarios_list' %}">Limpar</a>
+    </div>
+  </form>
+
+  {% if usuarios %}
+    <div class="table-clean-wrap">
+      <table class="table-clean">
         <thead>
-            <tr>
-                <th>Nome / Login</th>
-                <th>E-mail</th>
-                <th>Tipo</th>
-                <th>Permissões</th>
-                <th>Status</th>
-                <th style="width: 160px;">Ações</th>
-            </tr>
+          <tr>
+            <th>Nome / Login</th>
+            <th>E-mail</th>
+            <th>Tipo</th>
+            <th>Permissões</th>
+            <th>Status</th>
+            <th class="th-actions">Ações</th>
+          </tr>
         </thead>
+
         <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td>
-                    {{ usuario.get_full_name|default:usuario.username }}
-                </td>
-                <td>{{ usuario.email }}</td>
-                <td>
-                    {% if usuario.user_type == "owner" %}
-                    Administrador / Proprietário
-                    {% else %}
-                    Usuário padrão
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="chip-group">
-                        {% if usuario.can_manage_contatos %}
-                        <span class="chip">Contatos</span>
-                        {% endif %}
-                        {% if usuario.can_manage_servicos %}
-                        <span class="chip">Serviços</span>
-                        {% endif %}
-                        {% if usuario.can_manage_definicoes %}
-                        <span class="chip">Definições</span>
-                        {% endif %}
-                        {% if usuario.can_manage_usuarios %}
-                        <span class="chip">Usuários</span>
-                        {% endif %}
-                    </div>
-                </td>
-                <td>
-                    {% if usuario.is_active %}
-                    <span class="status-pill status-pill-on">Ativo</span>
-                    {% else %}
-                    <span class="status-pill status-pill-off">Inativo</span>
-                    {% endif %}
-                </td>
-                <td class="table-actions">
-                    {% with master=usuarios.0 %}
-                    {% if usuario.pk == master.pk %}
-                    {% if request.user.pk == master.pk %}
-                    <a href="{% url 'core:usuarios_update' usuario.pk %}" class="btn btn-small btn-outline">
-                        Editar
-                    </a>
-                    {% endif %}
-                    {% else %}
-                    <a href="{% url 'core:usuarios_update' usuario.pk %}" class="btn btn-small btn-outline">
-                        Editar
-                    </a>
-                    {% if request.user.pk != usuario.pk %}
-                    <a href="{% url 'core:usuarios_delete' usuario.pk %}" class="btn btn-small btn-outline btn-danger">
-                        Remover
-                    </a>
-                    {% endif %}
-                    {% endif %}
-                    {% endwith %}
-                </td>
-            </tr>
-            {% endfor %}
+          {% for usuario in usuarios %}
+          <tr>
+            <td class="td-title">
+              {{ usuario.get_full_name|default:usuario.username }}
+              <div class="td-sub muted">@{{ usuario.username }}</div>
+            </td>
+
+            <td class="td-muted">
+              {% if usuario.email %}{{ usuario.email }}{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+
+            <td>
+              {% if usuario.user_type == "owner" %}
+                <span class="tag tag--admin">Administrador</span>
+              {% else %}
+                <span class="tag tag--padrao">Padrão</span>
+              {% endif %}
+            </td>
+
+            <td>
+              <div class="tag-row">
+                {% if usuario.user_type == "owner" %}
+                  <span class="tag tag--perm-admin">Acesso total</span>
+                {% else %}
+                  {% if usuario.can_manage_contatos %}<span class="tag tag--perm-contatos">Contatos</span>{% endif %}
+                  {% if usuario.can_manage_servicos %}<span class="tag tag--perm-servicos">Serviços</span>{% endif %}
+                  {% if usuario.can_manage_definicoes %}<span class="tag tag--perm-defs">Definições</span>{% endif %}
+                  {% if usuario.can_manage_usuarios %}<span class="tag tag--perm-users">Usuários</span>{% endif %}
+                  {% if not usuario.can_manage_contatos and not usuario.can_manage_servicos and not usuario.can_manage_definicoes and not usuario.can_manage_usuarios %}
+                    <span class="muted">—</span>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </td>
+
+            <td>
+              {% if usuario.is_active %}
+                <span class="status status--on">Ativo</span>
+              {% else %}
+                <span class="status status--off">Inativo</span>
+              {% endif %}
+            </td>
+
+            <td class="td-actions">
+              {% with master=usuarios.0 %}
+                {% if usuario.pk == master.pk %}
+                  {% if request.user.pk == master.pk %}
+                    <a href="{% url 'core:usuarios_update' usuario.pk %}" class="icon-btn" title="Editar">Editar</a>
+                  {% else %}
+                    <span class="muted">—</span>
+                  {% endif %}
+                {% else %}
+                  <a href="{% url 'core:usuarios_update' usuario.pk %}" class="icon-btn" title="Editar">Editar</a>
+
+                  {% if request.user.pk != usuario.pk %}
+                    <a href="{% url 'core:usuarios_delete' usuario.pk %}" class="icon-btn icon-btn--danger" title="Remover">Remover</a>
+                  {% endif %}
+                {% endif %}
+              {% endwith %}
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
-    {% else %}
-    <p class="text-muted">Nenhum usuário cadastrado ainda.</p>
-    {% endif %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-clean">
+      <div class="empty-clean__title">Nenhum usuário cadastrado.</div>
+      <div class="empty-clean__subtitle text-muted">Clique em “Novo usuário” para cadastrar o primeiro.</div>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

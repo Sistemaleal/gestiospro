@@ -3,84 +3,132 @@
 {% block title %}Contatos{% endblock %}
 
 {% block header %}
-<h1>Contatos</h1>
+<div class="page-header">
+  <div class="page-header__title">
+    <h1>Contatos</h1>
+    <p class="text-muted">Cadastre e gerencie clientes, fornecedores e demais relacionamentos.</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="list-header">
-        <div>
-            <h2 class="list-title">Lista de contatos</h2>
-            <p class="list-subtitle">
-                Cadastre clientes, fornecedores, parceiros, funcionários, responsáveis técnicos e outros
-                relacionamentos.
-            </p>
-        </div>
-        <a href="{% url 'core:contatos_create' %}" class="btn btn-primary">Novo contato</a>
+<div class="card card-page card-list-clean">
+  <div class="listbar">
+    <div class="listbar__left">
+      <h2 class="listbar__title">Lista de contatos</h2>
+      <p class="listbar__subtitle text-muted">Pesquise e filtre rapidamente.</p>
     </div>
 
-    {% if contatos %}
-    <table class="table">
+    <div class="listbar__right">
+      <a href="{% url 'core:contatos_create' %}" class="btn btn-primary">Novo contato</a>
+    </div>
+  </div>
+
+  <!-- Filtros: clean (sem negrito exagerado) -->
+  <form class="filters-clean" method="get" autocomplete="off">
+    <div class="filters-clean__row">
+      <div class="filters-clean__search">
+        <input name="q" type="text" placeholder="Buscar por nome, e-mail, telefone..." value="{{ request.GET.q }}">
+      </div>
+
+      <select name="status" aria-label="Status">
+        <option value="" {% if not request.GET.status %}selected{% endif %}>Status: Todos</option>
+        <option value="ativo" {% if request.GET.status == "ativo" %}selected{% endif %}>Ativo</option>
+        <option value="inativo" {% if request.GET.status == "inativo" %}selected{% endif %}>Inativo</option>
+      </select>
+
+      <select name="rel" aria-label="Relacionamento">
+        <option value="" {% if not request.GET.rel %}selected{% endif %}>Relacionamento: Todos</option>
+        <option value="cliente" {% if request.GET.rel == "cliente" %}selected{% endif %}>Cliente</option>
+        <option value="fornecedor" {% if request.GET.rel == "fornecedor" %}selected{% endif %}>Fornecedor</option>
+        <option value="parceiro" {% if request.GET.rel == "parceiro" %}selected{% endif %}>Parceiro</option>
+        <option value="funcionario" {% if request.GET.rel == "funcionario" %}selected{% endif %}>Funcionário</option>
+        <option value="responsavel_tecnico" {% if request.GET.rel == "responsavel_tecnico" %}selected{% endif %}>Resp. técnico</option>
+        <option value="outro" {% if request.GET.rel == "outro" %}selected{% endif %}>Outros</option>
+      </select>
+
+      <button class="btn btn-outline" type="submit">Filtrar</button>
+      <a class="btn btn-outline" href="{% url 'core:contatos_list' %}">Limpar</a>
+    </div>
+  </form>
+
+  {% if contatos %}
+    <div class="table-clean-wrap">
+      <table class="table-clean">
         <thead>
-            <tr>
-                <th>Nome / Fantasia</th>
-                <th>Relacionamento</th>
-                <th>E-mail</th>
-                <th>Telefone</th>
-                <th>Ativo</th>
-                <th style="width:1%;">Ações</th>
-            </tr>
+          <tr>
+            <th>Nome / Fantasia</th>
+            <th>Relacionamento</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Status</th>
+            <th class="th-actions">Ações</th>
+          </tr>
         </thead>
+
         <tbody>
-            {% for contato in contatos %}
+          {% for contato in contatos %}
             {% with relacionamento_list=contato.get_relacionamentos_display %}
             <tr>
-                <td>{{ contato.nome_fantasia }}</td>
-                <td>
-                    {% if relacionamento_list %}
-                    <div class="chip-group">
-                        {% for rel in relacionamento_list %}
-                        <span class="chip">
-                            {% if rel == "cliente" %}Cliente
-                            {% elif rel == "funcionario" %}Funcionário
-                            {% elif rel == "parceiro" %}Parceiro
-                            {% elif rel == "fornecedor" %}Fornecedor
-                            {% elif rel == "responsavel_tecnico" %}Resp. técnico
-                            {% else %}Outros{% endif %}
-                        </span>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <span class="text-muted">—</span>
-                    {% endif %}
-                </td>
-                <td>{{ contato.email }}</td>
-                <td>{{ contato.telefone }}</td>
-                <td>
-                    {% if contato.ativo %}
-                    <span class="status-pill status-pill-on">Ativo</span>
-                    {% else %}
-                    <span class="status-pill status-pill-off">Inativo</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <div style="display:flex; gap:0.25rem;">
-                        <a href="{% url 'core:contatos_update' contato.pk %}" class="btn btn-outline btn-small">
-                            Editar
-                        </a>
-                        <a href="{% url 'core:contatos_delete' contato.pk %}" class="btn btn-outline btn-small"
-                            style="border-color:#ef4444; color:#ef4444;">
-                            Remover
-                        </a>
-                    </div>
-                </td>
+              <td class="td-title">
+                {{ contato.nome_fantasia }}
+              </td>
+
+              <td>
+                {% if relacionamento_list %}
+                  <div class="tag-row">
+                    {% for rel in relacionamento_list %}
+                      {% if rel == "cliente" %}
+                        <span class="tag tag--cliente">Cliente</span>
+                      {% elif rel == "fornecedor" %}
+                        <span class="tag tag--fornecedor">Fornecedor</span>
+                      {% elif rel == "parceiro" %}
+                        <span class="tag tag--parceiro">Parceiro</span>
+                      {% elif rel == "funcionario" %}
+                        <span class="tag tag--funcionario">Funcionário</span>
+                      {% elif rel == "responsavel_tecnico" %}
+                        <span class="tag tag--rt">Resp. técnico</span>
+                      {% else %}
+                        <span class="tag tag--outro">Outros</span>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <span class="muted">—</span>
+                {% endif %}
+              </td>
+
+              <td class="td-muted">
+                {% if contato.email %}{{ contato.email }}{% else %}<span class="muted">—</span>{% endif %}
+              </td>
+
+              <td class="td-muted">
+                {% if contato.telefone %}{{ contato.telefone }}{% else %}<span class="muted">—</span>{% endif %}
+              </td>
+
+              <td>
+                {% if contato.ativo %}
+                  <span class="status status--on">Ativo</span>
+                {% else %}
+                  <span class="status status--off">Inativo</span>
+                {% endif %}
+              </td>
+
+              <td class="td-actions">
+                <a href="{% url 'core:contatos_update' contato.pk %}" class="icon-btn" title="Editar">Editar</a>
+                <a href="{% url 'core:contatos_delete' contato.pk %}" class="icon-btn icon-btn--danger" title="Remover">Remover</a>
+              </td>
             </tr>
             {% endwith %}
-            {% endfor %}
+          {% endfor %}
         </tbody>
-    </table>
-    {% else %}
-    <p>Nenhum contato cadastrado ainda.</p>
-    {% endif %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-clean">
+      <div class="empty-clean__title">Nenhum contato cadastrado.</div>
+      <div class="empty-clean__subtitle text-muted">Clique em “Novo contato” para começar.</div>
+    </div>
+  {% endif %}
 </div>
-{% endblock %}c
+{% endblock %}

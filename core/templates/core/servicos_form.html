@@ -3,104 +3,151 @@
 
 {% block title %}Serviço{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/configuracoes.css' %}">
+<link rel="stylesheet" href="{% static 'css/cadastros.css' %}">
+{% endblock %}
+
 {% block header %}
-<h1>{% if object %}Editar serviço{% else %}Novo serviço{% endif %}</h1>
+<div class="page-header">
+  <div class="page-header__title">
+    <h1>{% if object %}Editar serviço{% else %}Novo serviço{% endif %}</h1>
+    <p class="text-muted">Cadastre serviços para reutilizar em propostas e projetos.</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="card card-page">
-    <form method="post" class="form-grid" id="servico-form">
-        {% csrf_token %}
+<div class="card card-page card-config">
+  <form method="post" class="config-form" id="servico-form">
+    {% csrf_token %}
 
-        <!-- Dados do serviço -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Dados do serviço</h2>
-                <p class="form-section-help">
-                    Cadastre os serviços que serão usados nas propostas/projetos.
-                </p>
-            </div>
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
 
-            <div class="form-group floating required">
-                {{ form.descricao }}
-                <label>Descrição do serviço*</label>
-            </div>
+    <!-- ========================= -->
+    <!-- DADOS DO SERVIÇO          -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Dados do serviço</h2>
+        <p class="cfg-section__help">Cadastre os serviços que serão usados nas propostas/projetos.</p>
+      </header>
 
-            <div class="form-group floating">
-                {{ form.valor }}
-                <label>Valor padrão (R$)</label>
-                <small class="text-muted">Opcional. Pode ser alterado na proposta.</small>
-            </div>
+      <div class="cfg-grid">
+        <div class="cfg-field cfg-field--full">
+          <label class="cfg-label" for="{{ form.descricao.id_for_label }}">Descrição do serviço</label>
+          <div class="cfg-control">{{ form.descricao }}</div>
+          <div class="cfg-errors">{{ form.descricao.errors }}</div>
         </div>
 
-        <!-- Categoria -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Categoria</h2>
-                <p class="form-section-help">
-                    Organize seus serviços em categorias (ex.: Projetos, Consultoria, Laudos).
-                    Você pode criar uma nova categoria rapidamente no botão ao lado.
-                </p>
-            </div>
+        <div class="cfg-field cfg-field--narrow">
+          <label class="cfg-label" for="{{ form.valor.id_for_label }}">Valor padrão (R$)</label>
+          <div class="cfg-control">{{ form.valor }}</div>
+          <div class="cfg-errors">{{ form.valor.errors }}</div>
+          <p class="cfg-hint text-muted">Opcional. Pode ser alterado na proposta.</p>
+        </div>
+      </div>
+    </section>
 
-            <div class="form-group with-addon">
-                {{ form.categoria }}
-                <button type="button" class="input-addon" id="btn-nova-categoria">
-                    + Nova categoria
-                </button>
-            </div>
+    <!-- ========================= -->
+    <!-- CATEGORIA                 -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Categoria</h2>
+        <p class="cfg-section__help">
+          Organize seus serviços em categorias (ex.: Projetos, Consultoria, Laudos).
+          Você pode criar uma nova categoria rapidamente no botão ao lado.
+        </p>
+      </header>
+
+      <div class="cfg-grid">
+        <div class="cfg-field cfg-field--with-addon cfg-field--full">
+          <label class="cfg-label" for="{{ form.categoria.id_for_label }}">Categoria</label>
+          <div class="cfg-addon-row">
+            <div class="cfg-control">{{ form.categoria }}</div>
+            <button type="button" class="btn btn-small btn-outline cfg-addon-btn" id="btn-nova-categoria">
+              + Nova categoria
+            </button>
+          </div>
+          <div class="cfg-errors">{{ form.categoria.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- ENTREGÁVEIS E STATUS      -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Entregáveis e status</h2>
+      </header>
+
+      <div class="cfg-grid">
+        <div class="cfg-field cfg-field--full">
+          <label class="cfg-label" for="{{ form.entregaveis.id_for_label }}">Entregáveis</label>
+          <div class="cfg-control">{{ form.entregaveis }}</div>
+          <div class="cfg-errors">{{ form.entregaveis.errors }}</div>
+          <p class="cfg-hint text-muted">Descreva o que será entregue (itens, documentos, arquivos etc.).</p>
         </div>
 
-        <!-- Entregáveis e status -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Entregáveis e status</h2>
-            </div>
-
-            <div class="form-group">
-                {{ form.entregaveis.label_tag }}
-                {{ form.entregaveis }}
-            </div>
-
-            <div class="form-group form-inline">
-                <label>{{ form.ativo.label }}</label>
-                {{ form.ativo }}
-            </div>
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.ativo.id_for_label }}">{{ form.ativo.label }}</label>
+          <div class="cfg-control">
+            <label class="switch">
+              {{ form.ativo }}
+              <span class="switch__ui" aria-hidden="true"></span>
+              <span class="switch__text text-muted">Ativo</span>
+            </label>
+          </div>
+          <div class="cfg-errors">{{ form.ativo.errors }}</div>
         </div>
+      </div>
+    </section>
 
-        <!-- Ações -->
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Salvar serviço</button>
-            <a href="{% url 'core:servicos_list' %}" class="btn btn-outline">Cancelar</a>
-        </div>
-    </form>
+    <!-- AÇÕES -->
+    <div class="cfg-actions">
+      <button type="submit" class="btn btn-primary">Salvar serviço</button>
+      <a href="{% url 'core:servicos_list' %}" class="btn btn-outline">Cancelar</a>
+    </div>
+  </form>
 </div>
 
 <!-- Modal de nova categoria -->
 <div class="modal-backdrop" id="modal-categoria-backdrop" style="display:none;">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h2>Nova categoria de serviço</h2>
-        </div>
-        <div class="modal-body">
-            <label class="modal-label" for="nova-categoria-nome">Nome da categoria</label>
-            <input type="text" id="nova-categoria-nome" class="form-control"
-                placeholder="Ex.: Projetos, Consultoria, Laudos" />
-            <p class="modal-help">
-                Essa categoria ficará disponível para todos os serviços desta empresa.
-            </p>
-            <p class="modal-error" id="modal-categoria-erro" style="display:none;"></p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline" id="modal-categoria-cancelar">
-                Cancelar
-            </button>
-            <button type="button" class="btn btn-primary" id="modal-categoria-salvar">
-                Salvar categoria
-            </button>
-        </div>
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Nova categoria de serviço</h2>
     </div>
-</div>
 
+    <div class="modal-body">
+      <label class="modal-label" for="nova-categoria-nome">Nome da categoria</label>
+      <input type="text" id="nova-categoria-nome"
+             placeholder="Ex.: Projetos, Consultoria, Laudos" />
+
+      <p class="modal-help text-muted">
+        Essa categoria ficará disponível para todos os serviços desta empresa.
+      </p>
+
+      <p class="modal-error" id="modal-categoria-erro" style="display:none;"></p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" id="modal-categoria-cancelar">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-primary" id="modal-categoria-salvar">
+        Salvar categoria
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'js/servico.js' %}"></script>
 {% endblock %}

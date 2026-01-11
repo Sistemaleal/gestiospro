@@ -8,263 +8,257 @@
 {% endblock %}
 
 {% block header %}
-<h1>Definições da empresa</h1>
+<div class="page-header">
+  <div class="page-header__title">
+    <h1>Definições da empresa</h1>
+    <p class="text-muted">Dados que aparecem no sistema e nos documentos.</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="card card-page">
-    <form method="post" class="form-grid" enctype="multipart/form-data" id="empresa-form">
-        {% csrf_token %}
+<div class="card card-page card-config">
+  <form method="post" class="config-form" enctype="multipart/form-data" id="empresa-form">
+    {% csrf_token %}
 
-        <!-- DADOS DA EMPRESA -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Dados da empresa</h2>
-                <p class="form-section-help">
-                    Informações básicas que aparecem no sistema e nos documentos.
-                </p>
-            </div>
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
 
-            <div class="form-grid-2">
-                <div class="form-group floating">
-                    {{ form.nome_fantasia }}
-                    <label for="{{ form.nome_fantasia.id_for_label }}">Nome fantasia</label>
-                    {{ form.nome_fantasia.errors }}
-                </div>
+    <!-- ========================= -->
+    <!-- DADOS DA EMPRESA          -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Dados da empresa</h2>
+        <p class="cfg-section__help">Informações básicas que aparecem no sistema e nos documentos.</p>
+      </header>
 
-                <div class="form-group floating">
-                    {{ form.razao_social }}
-                    <label for="{{ form.razao_social.id_for_label }}">Razão social</label>
-                    {{ form.razao_social.errors }}
-                </div>
-
-                <!-- CNPJ com botão de busca -->
-                <div class="form-group floating with-addon">
-                    {{ form.cnpj }}
-                    <label for="{{ form.cnpj.id_for_label }}">CPF / CNPJ</label>
-                    <button type="button" class="input-addon" id="btn-buscar-cnpj">
-                        Buscar CNPJ
-                    </button>
-                    {{ form.cnpj.errors }}
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.telefone }}
-                    <label for="{{ form.telefone.id_for_label }}">Telefone</label>
-                    {{ form.telefone.errors }}
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.email }}
-                    <label for="{{ form.email.id_for_label }}">E‑mail</label>
-                    {{ form.email.errors }}
-                </div>
-
-                <!-- CEP com botão de busca -->
-                <div class="form-group floating with-addon">
-                    {{ form.cep }}
-                    <label for="{{ form.cep.id_for_label }}">CEP</label>
-                    <button type="button" class="input-addon" id="btn-buscar-cep">
-                        Buscar CEP
-                    </button>
-                    {{ form.cep.errors }}
-                </div>
-            </div>
+      <div class="cfg-grid">
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.nome_fantasia.id_for_label }}">Nome fantasia</label>
+          <div class="cfg-control">{{ form.nome_fantasia }}</div>
+          <div class="cfg-errors">{{ form.nome_fantasia.errors }}</div>
         </div>
 
-        <!-- ENDEREÇO -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Endereço</h2>
-                <p class="form-section-help">
-                    Endereço da sede da empresa.
-                </p>
-            </div>
-
-            <div class="form-grid-3">
-                <div class="form-group floating">
-                    {{ form.logradouro }}
-                    <label for="{{ form.logradouro.id_for_label }}">Logradouro</label>
-                    {{ form.logradouro.errors }}
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.numero }}
-                    <label for="{{ form.numero.id_for_label }}">Número</label>
-                    {{ form.numero.errors }}
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.bairro }}
-                    <label for="{{ form.bairro.id_for_label }}">Bairro</label>
-                    {{ form.bairro.errors }}
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.cidade }}
-                    <label for="{{ form.cidade.id_for_label }}">Cidade</label>
-                    {{ form.cidade.errors }}
-                </div>
-
-                <div class="form-group select-group">
-                    <label for="{{ form.uf.id_for_label }}">UF</label>
-                    {{ form.uf }}
-                    {{ form.uf.errors }}
-                </div>
-
-                <div class="form-group floating" style="grid-column: 1 / -1;">
-                    {{ form.complemento }}
-                    <label for="{{ form.complemento.id_for_label }}">Complemento</label>
-                    {{ form.complemento.errors }}
-                </div>
-            </div>
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.razao_social.id_for_label }}">Razão social</label>
+          <div class="cfg-control">{{ form.razao_social }}</div>
+          <div class="cfg-errors">{{ form.razao_social.errors }}</div>
         </div>
 
-        <!-- IDENTIDADE VISUAL -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Identidade visual</h2>
-                <p class="form-section-help">
-                    Logo que será utilizada em relatórios, propostas e no cabeçalho do sistema.
-                </p>
-            </div>
-
-            <div class="form-grid-2">
-                <!-- Esquerda: upload -->
-                <div class="form-group">
-                    <label class="form-label">Logo da empresa</label>
-
-                    {% if form.instance.logo %}
-                        <!-- Botão ver logo -->
-                        <button type="button"
-                                id="btn-ver-logo"
-                                class="btn btn-small btn-outline"
-                                data-logo-url="{{ form.instance.logo.url }}"
-                                style="margin-bottom: 8px;">
-                            Ver logo
-                        </button>
-                    {% else %}
-                        <p class="text-muted" style="margin-bottom: 6px;">
-                            Nenhuma logo enviada ainda.
-                        </p>
-                    {% endif %}
-
-                    <div>
-                        {{ form.logo }}
-                        {{ form.logo.errors }}
-                    </div>
-
-                    <p class="text-muted" style="margin-top: 4px;">
-                        Formatos aceitos: JPG, PNG. Tamanho recomendado: 256x256px.
-                    </p>
-                </div>
-
-                <!-- Direita: pré‑visualização + botão Remover logo -->
-                <div class="form-group">
-                    <label class="form-label">Pré‑visualização</label>
-
-                    <div class="logo-preview-wrapper">
-                        <div class="logo-preview-avatar">
-                            <img id="logo-preview"
-                                 src="{% if form.instance.logo %}{{ form.instance.logo.url }}{% endif %}"
-                                 alt="Logo da empresa"
-                                 class="{% if not form.instance.logo %}is-hidden{% endif %}" />
-
-                            {% if not form.instance.logo %}
-                                <span id="logo-placeholder" class="logo-preview-placeholder">
-                                    {% if request.user.empresa.nome_fantasia %}
-                                        {{ request.user.empresa.nome_fantasia|first|upper }}
-                                    {% else %}
-                                        {{ request.user.username|first|upper }}
-                                    {% endif %}
-                                </span>
-                            {% endif %}
-                        </div>
-
-                        <div class="logo-preview-actions">
-                            <span class="text-muted logo-preview-text">
-                                Selecione um arquivo para atualizar a logo da empresa.
-                            </span>
-
-                            <button type="button" id="btn-limpar-logo"
-                                    class="btn btn-small btn-outline {% if not form.instance.logo %}is-hidden{% endif %}">
-                                Remover logo
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <input type="checkbox" name="logo-clear" id="id_logo_clear" style="display:none;">
-        </div>
-
-        <!-- AÇÕES -->
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                Salvar
+        <div class="cfg-field cfg-field--with-addon">
+          <label class="cfg-label" for="{{ form.cnpj.id_for_label }}">CPF / CNPJ</label>
+          <div class="cfg-addon-row">
+            <div class="cfg-control">{{ form.cnpj }}</div>
+            <button type="button" class="btn btn-small btn-outline cfg-addon-btn" id="btn-buscar-cnpj">
+              Buscar CNPJ
             </button>
-            <a href="{% url 'core:home' %}" class="btn btn-outline">
-                Cancelar
-            </a>
+          </div>
+          <div class="cfg-errors">{{ form.cnpj.errors }}</div>
         </div>
-    </form>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.telefone.id_for_label }}">Telefone</label>
+          <div class="cfg-control">{{ form.telefone }}</div>
+          <div class="cfg-errors">{{ form.telefone.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.email.id_for_label }}">E-mail</label>
+          <div class="cfg-control">{{ form.email }}</div>
+          <div class="cfg-errors">{{ form.email.errors }}</div>
+        </div>
+
+        <div class="cfg-field cfg-field--with-addon">
+          <label class="cfg-label" for="{{ form.cep.id_for_label }}">CEP</label>
+          <div class="cfg-addon-row">
+            <div class="cfg-control">{{ form.cep }}</div>
+            <button type="button" class="btn btn-small btn-outline cfg-addon-btn" id="btn-buscar-cep">
+              Buscar CEP
+            </button>
+          </div>
+          <div class="cfg-errors">{{ form.cep.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- ENDEREÇO                  -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Endereço</h2>
+        <p class="cfg-section__help">Endereço da sede da empresa.</p>
+      </header>
+
+      <div class="cfg-grid cfg-grid--3">
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.logradouro.id_for_label }}">Logradouro</label>
+          <div class="cfg-control">{{ form.logradouro }}</div>
+          <div class="cfg-errors">{{ form.logradouro.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.numero.id_for_label }}">Número</label>
+          <div class="cfg-control">{{ form.numero }}</div>
+          <div class="cfg-errors">{{ form.numero.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.bairro.id_for_label }}">Bairro</label>
+          <div class="cfg-control">{{ form.bairro }}</div>
+          <div class="cfg-errors">{{ form.bairro.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.cidade.id_for_label }}">Cidade</label>
+          <div class="cfg-control">{{ form.cidade }}</div>
+          <div class="cfg-errors">{{ form.cidade.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.uf.id_for_label }}">UF</label>
+          <div class="cfg-control">{{ form.uf }}</div>
+          <div class="cfg-errors">{{ form.uf.errors }}</div>
+        </div>
+
+        <div class="cfg-field cfg-field--full">
+          <label class="cfg-label" for="{{ form.complemento.id_for_label }}">Complemento</label>
+          <div class="cfg-control">{{ form.complemento }}</div>
+          <div class="cfg-errors">{{ form.complemento.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- IDENTIDADE VISUAL         -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Identidade visual</h2>
+        <p class="cfg-section__help">
+          Logo utilizada em relatórios, propostas e no cabeçalho do sistema.
+        </p>
+      </header>
+
+      <div class="cfg-grid cfg-grid--2wide">
+        <!-- Upload -->
+        <div class="cfg-field cfg-field--full">
+          <label class="cfg-label">Logo da empresa</label>
+
+          <div class="logo-card">
+            <div class="logo-card__left">
+              <div class="logo-preview-avatar">
+                <img id="logo-preview"
+                     src="{% if form.instance.logo %}{{ form.instance.logo.url }}{% endif %}"
+                     alt="Logo da empresa"
+                     class="{% if not form.instance.logo %}is-hidden{% endif %}" />
+
+                <span id="logo-placeholder" class="logo-preview-placeholder {% if form.instance.logo %}is-hidden{% endif %}">
+                  {% if request.user.empresa.nome_fantasia %}
+                    {{ request.user.empresa.nome_fantasia|first|upper }}
+                  {% else %}
+                    {{ request.user.username|first|upper }}
+                  {% endif %}
+                </span>
+              </div>
+
+              <div class="logo-card__meta">
+                <div class="logo-card__title">Pré-visualização</div>
+                <div class="logo-card__desc text-muted">
+                  Envie uma imagem PNG/JPG. Recomendado: 256×256px.
+                </div>
+
+                <div class="logo-card__actions">
+                  {% if form.instance.logo %}
+                    <a href="{{ form.instance.logo.url }}" target="_blank" class="btn btn-small btn-outline">
+                      Ver logo
+                    </a>
+                  {% endif %}
+
+                  <button type="button"
+                          id="btn-limpar-logo"
+                          class="btn btn-small btn-outline {% if not form.instance.logo %}is-hidden{% endif %}">
+                    Remover
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="logo-card__right">
+              <div class="cfg-control">
+                {{ form.logo }}
+              </div>
+              <div class="cfg-errors">{{ form.logo.errors }}</div>
+              <p class="cfg-hint text-muted">Ao salvar, a logo será aplicada no sistema e nos PDFs.</p>
+            </div>
+          </div>
+
+          <input type="checkbox" name="logo-clear" id="id_logo_clear" style="display:none;">
+        </div>
+      </div>
+    </section>
+
+    <!-- AÇÕES -->
+    <div class="cfg-actions">
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <a href="{% url 'core:home' %}" class="btn btn-outline">Cancelar</a>
+    </div>
+  </form>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/funcoes_gerais.js' %}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const inputLogo = document.getElementById("id_logo");
-        const imgPreview = document.getElementById("logo-preview");
-        const placeholder = document.getElementById("logo-placeholder");
-        const btnLimpar = document.getElementById("btn-limpar-logo");
+document.addEventListener("DOMContentLoaded", () => {
+  const inputLogo = document.getElementById("id_logo");
+  const imgPreview = document.getElementById("logo-preview");
+  const placeholder = document.getElementById("logo-placeholder");
+  const btnLimpar = document.getElementById("btn-limpar-logo");
 
-        function mostrarPlaceholder() {
-            if (imgPreview) imgPreview.classList.add("is-hidden");
-            if (placeholder) placeholder.classList.remove("is-hidden");
-            if (btnLimpar) btnLimpar.classList.add("is-hidden");
-        }
+  function mostrarPlaceholder() {
+    if (imgPreview) imgPreview.classList.add("is-hidden");
+    if (placeholder) placeholder.classList.remove("is-hidden");
+    if (btnLimpar) btnLimpar.classList.add("is-hidden");
+  }
 
-        function mostrarImagem() {
-            if (imgPreview) imgPreview.classList.remove("is-hidden");
-            if (placeholder) placeholder.classList.add("is-hidden");
-            if (btnLimpar) btnLimpar.classList.remove("is-hidden");
-        }
+  function mostrarImagem() {
+    if (imgPreview) imgPreview.classList.remove("is-hidden");
+    if (placeholder) placeholder.classList.add("is-hidden");
+    if (btnLimpar) btnLimpar.classList.remove("is-hidden");
+  }
 
-        // Atualiza preview ao escolher arquivo
-        if (inputLogo && imgPreview) {
-            inputLogo.addEventListener("change", () => {
-                const file = inputLogo.files && inputLogo.files[0];
-                if (!file) {
-                    imgPreview.src = "";
-                    mostrarPlaceholder();
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imgPreview.src = e.target.result;
-                    mostrarImagem();
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Botão "Remover logo" reseta input + preview visual (backend remove via logo-clear)
-        if (btnLimpar && inputLogo && imgPreview) {
-            btnLimpar.addEventListener("click", (e) => {
-                e.preventDefault();
-                // marca checkbox django para limpar no save, se ela existir
-                const clearCheckbox = document.querySelector('input[name="logo-clear"]');
-                if (clearCheckbox) {
-                    clearCheckbox.checked = true;
-                }
-                inputLogo.value = "";
-                imgPreview.src = "";
-                mostrarPlaceholder();
-            });
-        }
+  if (inputLogo && imgPreview) {
+    inputLogo.addEventListener("change", () => {
+      const file = inputLogo.files && inputLogo.files[0];
+      if (!file) {
+        imgPreview.src = "";
+        mostrarPlaceholder();
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imgPreview.src = e.target.result;
+        mostrarImagem();
+      };
+      reader.readAsDataURL(file);
     });
+  }
+
+  if (btnLimpar && inputLogo && imgPreview) {
+    btnLimpar.addEventListener("click", (e) => {
+      e.preventDefault();
+      const clearCheckbox = document.querySelector('input[name="logo-clear"]');
+      if (clearCheckbox) clearCheckbox.checked = true;
+      inputLogo.value = "";
+      imgPreview.src = "";
+      mostrarPlaceholder();
+    });
+  }
+});
 </script>
-{% endblock %}
 {% endblock %}

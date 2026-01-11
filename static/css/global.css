@@ -1,11 +1,18 @@
-/* static/css/main.css */
 :root {
     --color-primary: #5271FF;
     --color-secondary: #29DB95;
-    --color-white: #fff;
-    --color-black: #131313;
-    --color-grey-light: #F5F6FA;
-    --color-grey: #D9D9D9;
+
+    --ui-bg: #F5F6FA;
+    --ui-card: #ffffff;
+    --ui-border: #dfe4ef;
+
+    --ui-text: #111827;
+    --ui-muted: #6b7280;
+
+    --ui-input-bg: #ffffff;
+    --ui-input-border: #cfd7e6;
+    --ui-focus: rgba(82, 113, 255, 0.18);
+
     --font-family-main: 'Inter', 'Segoe UI', Arial, sans-serif;
 }
 
@@ -17,6 +24,58 @@
 
 body {
     font-family: var(--font-family-main);
-    background: var(--color-grey-light);
-    color: var(--color-black);
+    background: var(--ui-bg);
+    color: var(--ui-text);
+}
+
+.text-muted {
+    color: var(--ui-muted);
+}
+
+/* Base de forms (não depende de classes do widget) */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+    width: 100%;
+    background: var(--ui-input-bg);
+    border: 1.5px solid var(--ui-input-border);
+    border-radius: 12px;
+    padding: 0.72rem 0.9rem;
+    font-size: 0.95rem;
+    color: var(--ui-text);
+    outline: none;
+    transition: border-color .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+textarea {
+    min-height: 120px;
+    line-height: 1.45;
+    resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px var(--ui-focus);
+}
+
+::placeholder {
+    color: #9ca3af;
+}
+
+/* Erros Django */
+.errorlist,
+.errorlist li {
+    list-style: none;
+    margin: 0.35rem 0 0 0;
+    padding: 0;
+    color: #ef4444;
+    font-size: 0.9rem;
 }

@@ -3,152 +3,191 @@
 
 {% block title %}Usuário{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/configuracoes.css' %}">
+<link rel="stylesheet" href="{% static 'css/cadastros.css' %}">
+{% endblock %}
+
 {% block header %}
-<h1>{% if object %}Editar usuário{% else %}Novo usuário{% endif %}</h1>
+<div class="page-header">
+  <div class="page-header__title">
+    <h1>{% if object %}Editar usuário{% else %}Novo usuário{% endif %}</h1>
+    <p class="text-muted">Defina dados de acesso, tipo de usuário e permissões.</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="card card-page">
-    <form method="post" class="form-grid" id="usuario-form">
-        {% csrf_token %}
+<div class="card card-page card-config">
+  <form method="post" class="config-form" id="usuario-form">
+    {% csrf_token %}
 
-        <!-- DADOS DO USUÁRIO -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Dados do usuário</h2>
-                <p class="form-section-help">
-                    Defina os dados de acesso e o tipo de usuário.
-                </p>
-            </div>
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
 
-            <div class="form-grid-2">
-                <!-- Tipo de usuário -->
-                <div class="form-group select-group">
-                    <label for="{{ form.user_type.id_for_label }}">Tipo de usuário</label>
-                    {{ form.user_type }}
-                    <p class="text-muted">
-                        Administrador / Proprietário tem acesso completo aos módulos da empresa.
-                    </p>
-                    {{ form.user_type.errors }}
-                </div>
+    <!-- ========================= -->
+    <!-- DADOS DO USUÁRIO          -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Dados do usuário</h2>
+        <p class="cfg-section__help">Defina os dados de acesso e o tipo de usuário.</p>
+      </header>
 
-                <!-- Usuário (login) -->
-                <div class="form-group floating required">
-                    {{ form.username }}
-                    <label for="{{ form.username.id_for_label }}">Usuário (login) *</label>
-                    {{ form.username.errors }}
-                </div>
-
-                <!-- E‑mail -->
-                <div class="form-group floating">
-                    {{ form.email }}
-                    <label for="{{ form.email.id_for_label }}">E‑mail</label>
-                    {{ form.email.errors }}
-                </div>
-
-                <!-- Nome -->
-                <div class="form-group floating">
-                    <input type="text" name="first_name" id="id_first_name" class="form-control"
-                        value="{{ form.instance.first_name }}">
-                    <label for="id_first_name">Nome</label>
-                </div>
-
-                <!-- Sobrenome -->
-                <div class="form-group floating">
-                    <input type="text" name="last_name" id="id_last_name" class="form-control"
-                        value="{{ form.instance.last_name }}">
-                    <label for="id_last_name">Sobrenome</label>
-                </div>
-
-                <!-- Senha com botão Mostrar -->
-                <div class="form-group with-addon">
-                    <label for="{{ form.password.id_for_label }}">
-                        Senha{% if not object %} *{% endif %}
-                    </label>
-                    {{ form.password }}
-                    <button type="button" class="input-addon" id="btn-toggle-password">
-                        Mostrar
-                    </button>
-                    {% if object %}
-                    <small class="text-muted">
-                        Deixe em branco para manter a senha atual.
-                    </small>
-                    {% endif %}
-                    {{ form.password.errors }}
-                </div>
-
-                <!-- Ativo -->
-                <div class="form-group form-inline">
-                    <label>{{ form.is_active.label }}</label>
-                    {{ form.is_active }}
-                    {{ form.is_active.errors }}
-                </div>
-            </div>
-
-            {% if form.non_field_errors %}
-            <div class="form-errors">
-                {% for error in form.non_field_errors %}
-                <div class="alert alert-error">{{ error }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
+      <div class="cfg-grid">
+        <!-- Tipo de usuário -->
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.user_type.id_for_label }}">Tipo de usuário</label>
+          <div class="cfg-control">{{ form.user_type }}</div>
+          <p class="cfg-hint text-muted">
+            Administrador/Proprietário tem acesso completo aos módulos da empresa.
+          </p>
+          <div class="cfg-errors">{{ form.user_type.errors }}</div>
         </div>
 
-        <!-- PERMISSÕES -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Permissões</h2>
-                <p class="form-section-help">
-                    Para usuários <strong>Administrador / Proprietário</strong>, todas as permissões serão ligadas
-                    automaticamente ao salvar. Para usuários padrão, marque apenas o que ele poderá gerenciar.
-                </p>
-            </div>
-
-            <div class="checkbox-group">
-                <label
-                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
-                    {{ form.can_manage_contatos }}
-                    <span>Contatos</span>
-                </label>
-                <label
-                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
-                    {{ form.can_manage_servicos }}
-                    <span>Serviços</span>
-                </label>
-                <label
-                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
-                    {{ form.can_manage_definicoes }}
-                    <span>Definições da empresa</span>
-                </label>
-                <label
-                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
-                    {{ form.can_manage_propostas_definicoes }}
-                    <span>Definições de propostas</span>
-                </label>
-                <label
-                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
-                    {{ form.can_manage_propostas }}
-                    <span>Propostas</span>
-                </label>
-                <label
-                    class="checkbox-pill {% if object and object.user_type == 'owner' %}checkbox-pill-disabled{% endif %}">
-                    {{ form.can_manage_usuarios }}
-                    <span>Usuários</span>
-                </label>
-            </div>
+        <!-- Usuário (login) -->
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.username.id_for_label }}">Usuário (login)</label>
+          <div class="cfg-control">{{ form.username }}</div>
+          <div class="cfg-errors">{{ form.username.errors }}</div>
         </div>
 
-        <!-- AÇÕES -->
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                {% if object %}Salvar alterações{% else %}Salvar usuário{% endif %}
+        <!-- E-mail -->
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.email.id_for_label }}">E-mail</label>
+          <div class="cfg-control">{{ form.email }}</div>
+          <div class="cfg-errors">{{ form.email.errors }}</div>
+        </div>
+
+        <!-- Nome -->
+        <div class="cfg-field">
+          <label class="cfg-label" for="id_first_name">Nome</label>
+          <div class="cfg-control">
+            <input type="text" name="first_name" id="id_first_name" value="{{ form.instance.first_name|default:'' }}">
+          </div>
+        </div>
+
+        <!-- Sobrenome -->
+        <div class="cfg-field">
+          <label class="cfg-label" for="id_last_name">Sobrenome</label>
+          <div class="cfg-control">
+            <input type="text" name="last_name" id="id_last_name" value="{{ form.instance.last_name|default:'' }}">
+          </div>
+        </div>
+
+        <!-- Senha com botão Mostrar -->
+        <div class="cfg-field cfg-field--with-addon">
+          <label class="cfg-label" for="{{ form.password.id_for_label }}">
+            Senha{% if not object %} (obrigatória){% else %} (opcional){% endif %}
+          </label>
+
+          <div class="cfg-addon-row">
+            <div class="cfg-control cfg-control--password">
+              {{ form.password }}
+            </div>
+            <button type="button" class="btn btn-small btn-outline cfg-addon-btn" id="btn-toggle-password">
+              Mostrar
             </button>
-            <a href="{% url 'core:usuarios_list' %}" class="btn btn-outline">
-                Cancelar
-            </a>
-        </div>
-    </form>
-</div>
+          </div>
 
+          {% if object %}
+            <p class="cfg-hint text-muted">Deixe em branco para manter a senha atual.</p>
+          {% endif %}
+
+          <div class="cfg-errors">{{ form.password.errors }}</div>
+        </div>
+
+        <!-- Ativo (Switch) -->
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+          <div class="cfg-control">
+            <label class="switch">
+              {{ form.is_active }}
+              <span class="switch__ui" aria-hidden="true"></span>
+              <span class="switch__text text-muted">Ativo</span>
+            </label>
+          </div>
+          <div class="cfg-errors">{{ form.is_active.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- PERMISSÕES (TAGS)         -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Permissões</h2>
+        <p class="cfg-section__help">
+          Para usuários <strong>Administrador / Proprietário</strong>, todas as permissões serão ligadas automaticamente ao salvar.
+          Para usuários padrão, marque apenas o que ele poderá gerenciar.
+        </p>
+      </header>
+
+      <div class="pill-grid">
+        <label class="tag-pill {% if object and object.user_type == 'owner' %}tag-pill--disabled{% endif %}">
+          {{ form.can_manage_contatos }}
+          <span>Contatos</span>
+        </label>
+
+        <label class="tag-pill {% if object and object.user_type == 'owner' %}tag-pill--disabled{% endif %}">
+          {{ form.can_manage_servicos }}
+          <span>Serviços</span>
+        </label>
+
+        <label class="tag-pill {% if object and object.user_type == 'owner' %}tag-pill--disabled{% endif %}">
+          {{ form.can_manage_definicoes }}
+          <span>Definições da empresa</span>
+        </label>
+
+        <label class="tag-pill {% if object and object.user_type == 'owner' %}tag-pill--disabled{% endif %}">
+          {{ form.can_manage_propostas_definicoes }}
+          <span>Definições de propostas</span>
+        </label>
+
+        <label class="tag-pill {% if object and object.user_type == 'owner' %}tag-pill--disabled{% endif %}">
+          {{ form.can_manage_propostas }}
+          <span>Propostas</span>
+        </label>
+
+        <label class="tag-pill {% if object and object.user_type == 'owner' %}tag-pill--disabled{% endif %}">
+          {{ form.can_manage_usuarios }}
+          <span>Usuários</span>
+        </label>
+      </div>
+
+      <div class="cfg-errors" style="margin-top: 8px;">
+        {{ form.can_manage_contatos.errors }}
+        {{ form.can_manage_servicos.errors }}
+        {{ form.can_manage_definicoes.errors }}
+        {{ form.can_manage_propostas_definicoes.errors }}
+        {{ form.can_manage_propostas.errors }}
+        {{ form.can_manage_usuarios.errors }}
+      </div>
+
+      {% if object and object.user_type == 'owner' %}
+        <p class="cfg-hint text-muted" style="margin-top:10px;">
+          Usuário proprietário: permissões são sempre completas.
+        </p>
+      {% endif %}
+    </section>
+
+    <!-- AÇÕES -->
+    <div class="cfg-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if object %}Salvar alterações{% else %}Salvar usuário{% endif %}
+      </button>
+      <a href="{% url 'core:usuarios_list' %}" class="btn btn-outline">
+        Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'js/usuarios.js' %}"></script>
 {% endblock %}

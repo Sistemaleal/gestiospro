@@ -4,61 +4,102 @@
 {% block title %}Serviços{% endblock %}
 
 {% block header %}
-<h1>Serviços</h1>
+<div class="page-header">
+  <div class="page-header__title">
+    <h1>Serviços</h1>
+    <p class="text-muted">Catálogo de serviços oferecidos pela sua empresa.</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="card card-page">
-    <div class="list-header">
-        <div>
-            <h2 class="list-title">Catálogo de serviços</h2>
-            <p class="list-subtitle">
-                Cadastre e gerencie os serviços oferecidos pela sua empresa.
-            </p>
-        </div>
-        <div>
-            <a href="{% url 'core:servicos_create' %}" class="btn btn-primary">
-                Novo serviço
-            </a>
-        </div>
+<div class="card card-page card-list-clean">
+  <div class="listbar">
+    <div class="listbar__left">
+      <h2 class="listbar__title">Catálogo de serviços</h2>
+      <p class="listbar__subtitle text-muted">Cadastre, filtre e gerencie seus serviços.</p>
     </div>
 
-    {% if servicos %}
-    <table class="table">
+    <div class="listbar__right">
+      <a href="{% url 'core:servicos_create' %}" class="btn btn-primary">Novo serviço</a>
+    </div>
+  </div>
+
+  <!-- Filtros (UI clean; backend pode ligar via GET depois) -->
+  <form class="filters-clean" method="get" autocomplete="off">
+    <div class="filters-clean__row filters-clean__row--services">
+      <div class="filters-clean__search">
+        <input name="q" type="text" placeholder="Buscar por descrição..." value="{{ request.GET.q }}">
+      </div>
+
+      <select name="status" aria-label="Status">
+        <option value="" {% if not request.GET.status %}selected{% endif %}>Status: Todos</option>
+        <option value="ativo" {% if request.GET.status == "ativo" %}selected{% endif %}>Ativo</option>
+        <option value="inativo" {% if request.GET.status == "inativo" %}selected{% endif %}>Inativo</option>
+      </select>
+
+      <select name="categoria" aria-label="Categoria">
+        <option value="" {% if not request.GET.categoria %}selected{% endif %}>Categoria: Todas</option>
+        {# Se você já passar uma lista "categorias" no context, fica perfeito #}
+        {% if categorias %}
+          {% for cat in categorias %}
+            <option value="{{ cat }}" {% if request.GET.categoria == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+
+      <button class="btn btn-outline" type="submit">Filtrar</button>
+      <a class="btn btn-outline" href="{% url 'core:servicos_list' %}">Limpar</a>
+    </div>
+  </form>
+
+  {% if servicos %}
+    <div class="table-clean-wrap">
+      <table class="table-clean">
         <thead>
-            <tr>
-                <th>Descrição</th>
-                <th>Categoria</th>
-                <th style="width: 120px;">Status</th>
-                <th style="width: 160px;">Ações</th>
-            </tr>
+          <tr>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Status</th>
+            <th class="th-actions">Ações</th>
+          </tr>
         </thead>
+
         <tbody>
-            {% for servico in servicos %}
-            <tr>
-                <td>{{ servico.descricao }}</td>
-                <td>{{ servico.categoria|default:"-" }}</td>
-                <td>
-                    {% if servico.ativo %}
-                    <span class="status-pill status-pill-on">Ativo</span>
-                    {% else %}
-                    <span class="status-pill status-pill-off">Inativo</span>
-                    {% endif %}
-                </td>
-                <td class="table-actions">
-                    <a href="{% url 'core:servicos_update' servico.pk %}" class="btn btn-small btn-outline">
-                        Editar
-                    </a>
-                    <a href="{% url 'core:servicos_delete' servico.pk %}" class="btn btn-small btn-outline btn-danger">
-                        Remover
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
+          {% for servico in servicos %}
+          <tr>
+            <td class="td-title">{{ servico.descricao }}</td>
+
+            <td class="td-muted">
+              {% if servico.categoria %}
+                <span class="tag tag--categoria">{{ servico.categoria }}</span>
+              {% else %}
+                <span class="muted">—</span>
+              {% endif %}
+            </td>
+
+            <td>
+              {% if servico.ativo %}
+                <span class="status status--on">Ativo</span>
+              {% else %}
+                <span class="status status--off">Inativo</span>
+              {% endif %}
+            </td>
+
+            <td class="td-actions">
+              <a href="{% url 'core:servicos_update' servico.pk %}" class="icon-btn" title="Editar">Editar</a>
+              <a href="{% url 'core:servicos_delete' servico.pk %}" class="icon-btn icon-btn--danger" title="Remover">Remover</a>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
-    {% else %}
-    <p class="text-muted">Nenhum serviço cadastrado ainda.</p>
-    {% endif %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-clean">
+      <div class="empty-clean__title">Nenhum serviço cadastrado.</div>
+      <div class="empty-clean__subtitle text-muted">Clique em “Novo serviço” para cadastrar o primeiro.</div>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

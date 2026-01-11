@@ -3,176 +3,226 @@
 
 {% block title %}Contato{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/configuracoes.css' %}">
+<link rel="stylesheet" href="{% static 'css/cadastros.css' %}">
+{% endblock %}
+
 {% block header %}
-<h1>{% if object %}Editar contato{% else %}Novo contato{% endif %}</h1>
+<div class="page-header">
+  <div class="page-header__title">
+    <h1>{% if object %}Editar contato{% else %}Novo contato{% endif %}</h1>
+    <p class="text-muted">Cadastro do contato/cliente e suas informações.</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="card card-page">
-    <form method="post" class="form-grid" id="contato-form">
-        {% csrf_token %}
+<div class="card card-page card-config">
+  <form method="post" class="config-form" id="contato-form">
+    {% csrf_token %}
 
-        <!-- DADOS PRINCIPAIS -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Dados principais</h2>
-                <p class="form-section-help">
-                    Identificação básica do contato / cliente.
-                </p>
-            </div>
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
 
-            <div class="form-grid-2">
-                <!-- CPF/CNPJ com botão de busca -->
-                <div class="form-group floating with-addon">
-                    {{ form.cpf_cnpj }}
-                    <label>CPF / CNPJ</label>
-                    <button type="button"
-                            class="input-addon"
-                            id="btn-buscar-cnpj">
-                        Buscar CNPJ
-                    </button>
-                </div>
+    <!-- ========================= -->
+    <!-- DADOS PRINCIPAIS          -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Dados principais</h2>
+        <p class="cfg-section__help">Identificação básica do contato / cliente.</p>
+      </header>
 
-                <div class="form-group floating required">
-                    {{ form.nome_fantasia }}
-                    <label>Nome do cliente / Nome fantasia*</label>
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.razao_social }}
-                    <label>Razão social</label>
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.telefone }}
-                    <label>Telefone</label>
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.email }}
-                    <label>E‑mail</label>
-                </div>
-
-                <div class="form-group form-inline">
-                    <label>{{ form.ativo.label }}</label>
-                    {{ form.ativo }}
-                </div>
-            </div>
-        </div>
-
-        <!-- RELACIONAMENTOS -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Relacionamento</h2>
-                <p class="form-section-help">
-                    Marque os papéis que este contato exerce para sua empresa.
-                </p>
-            </div>
-
-            <div class="checkbox-group">
-                <label class="checkbox-pill">
-                    {{ form.is_cliente }}
-                    <span>Cliente</span>
-                </label>
-                <label class="checkbox-pill">
-                    {{ form.is_fornecedor }}
-                    <span>Fornecedor</span>
-                </label>
-                <label class="checkbox-pill">
-                    {{ form.is_parceiro }}
-                    <span>Parceiro</span>
-                </label>
-                <label class="checkbox-pill">
-                    {{ form.is_funcionario }}
-                    <span>Funcionário</span>
-                </label>
-                <label class="checkbox-pill">
-                    {{ form.is_responsavel_tecnico }}
-                    <span>Responsável técnico</span>
-                </label>
-                <label class="checkbox-pill">
-                    {{ form.is_outro }}
-                    <span>Outros</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- ENDEREÇO -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Endereço</h2>
-                <p class="form-section-help">
-                    Dados de endereço do contato.
-                </p>
-            </div>
-
-            <div class="form-grid-3">
-                <!-- CEP com botão de busca -->
-                <div class="form-group floating with-addon">
-                    {{ form.cep }}
-                    <label>CEP</label>
-                    <button type="button"
-                            class="input-addon"
-                            id="btn-buscar-cep">
-                        Buscar CEP
-                    </button>
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.logradouro }}
-                    <label>Endereço</label>
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.numero }}
-                    <label>Número</label>
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.bairro }}
-                    <label>Bairro</label>
-                </div>
-
-                <div class="form-group floating">
-                    {{ form.cidade }}
-                    <label>Cidade</label>
-                </div>
-
-                <!-- UF volta para versão simples, que já funcionava -->
-                <div class="form-group select-group">
-                    <label for="{{ form.uf.id_for_label }}">UF</label>
-                    {{ form.uf }}
-                </div>
-
-                <div class="form-group floating" style="grid-column: 1 / -1;">
-                    {{ form.complemento }}
-                    <label>Complemento</label>
-                </div>
-            </div>
-        </div>
-
-        <!-- OBSERVAÇÕES -->
-        <div class="form-section">
-            <div class="form-section-header">
-                <h2 class="form-section-title">Observações</h2>
-            </div>
-
-            <div class="form-group">
-                {{ form.observacao }}
-            </div>
-        </div>
-
-        <!-- AÇÕES -->
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                Salvar contato
+      <div class="cfg-grid">
+        <div class="cfg-field cfg-field--with-addon">
+          <label class="cfg-label" for="{{ form.cpf_cnpj.id_for_label }}">CPF / CNPJ</label>
+          <div class="cfg-addon-row">
+            <div class="cfg-control">{{ form.cpf_cnpj }}</div>
+            <button type="button" class="btn btn-small btn-outline cfg-addon-btn" id="btn-buscar-cnpj">
+              Buscar CNPJ
             </button>
-            <a href="{% url 'core:contatos_list' %}" class="btn btn-outline">
-                Cancelar
-            </a>
+          </div>
+          <div class="cfg-errors">{{ form.cpf_cnpj.errors }}</div>
         </div>
-    </form>
-</div>
 
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.nome_fantasia.id_for_label }}">Nome do cliente / Nome fantasia</label>
+          <div class="cfg-control">{{ form.nome_fantasia }}</div>
+          <div class="cfg-errors">{{ form.nome_fantasia.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.razao_social.id_for_label }}">Razão social</label>
+          <div class="cfg-control">{{ form.razao_social }}</div>
+          <div class="cfg-errors">{{ form.razao_social.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.telefone.id_for_label }}">Telefone</label>
+          <div class="cfg-control">{{ form.telefone }}</div>
+          <div class="cfg-errors">{{ form.telefone.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.email.id_for_label }}">E-mail</label>
+          <div class="cfg-control">{{ form.email }}</div>
+          <div class="cfg-errors">{{ form.email.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.ativo.id_for_label }}">{{ form.ativo.label }}</label>
+          <div class="cfg-control">
+            <label class="switch">
+              {{ form.ativo }}
+              <span class="switch__ui" aria-hidden="true"></span>
+              <span class="switch__text text-muted">Ativo</span>
+            </label>
+          </div>
+          <div class="cfg-errors">{{ form.ativo.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- RELACIONAMENTO (TAGS)     -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Relacionamento</h2>
+        <p class="cfg-section__help">Marque os papéis que este contato exerce para sua empresa.</p>
+      </header>
+
+      <div class="pill-grid">
+        <label class="tag-pill">
+          {{ form.is_cliente }}
+          <span>Cliente</span>
+        </label>
+
+        <label class="tag-pill">
+          {{ form.is_fornecedor }}
+          <span>Fornecedor</span>
+        </label>
+
+        <label class="tag-pill">
+          {{ form.is_parceiro }}
+          <span>Parceiro</span>
+        </label>
+
+        <label class="tag-pill">
+          {{ form.is_funcionario }}
+          <span>Funcionário</span>
+        </label>
+
+        <label class="tag-pill">
+          {{ form.is_responsavel_tecnico }}
+          <span>Responsável técnico</span>
+        </label>
+
+        <label class="tag-pill">
+          {{ form.is_outro }}
+          <span>Outros</span>
+        </label>
+      </div>
+
+      <div class="cfg-errors">
+        {{ form.is_cliente.errors }}
+        {{ form.is_fornecedor.errors }}
+        {{ form.is_parceiro.errors }}
+        {{ form.is_funcionario.errors }}
+        {{ form.is_responsavel_tecnico.errors }}
+        {{ form.is_outro.errors }}
+      </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- ENDEREÇO                  -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Endereço</h2>
+        <p class="cfg-section__help">Dados de endereço do contato.</p>
+      </header>
+
+      <div class="cfg-grid cfg-grid--3">
+        <div class="cfg-field cfg-field--with-addon">
+          <label class="cfg-label" for="{{ form.cep.id_for_label }}">CEP</label>
+          <div class="cfg-addon-row">
+            <div class="cfg-control">{{ form.cep }}</div>
+            <button type="button" class="btn btn-small btn-outline cfg-addon-btn" id="btn-buscar-cep">
+              Buscar CEP
+            </button>
+          </div>
+          <div class="cfg-errors">{{ form.cep.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.logradouro.id_for_label }}">Endereço</label>
+          <div class="cfg-control">{{ form.logradouro }}</div>
+          <div class="cfg-errors">{{ form.logradouro.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.numero.id_for_label }}">Número</label>
+          <div class="cfg-control">{{ form.numero }}</div>
+          <div class="cfg-errors">{{ form.numero.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.bairro.id_for_label }}">Bairro</label>
+          <div class="cfg-control">{{ form.bairro }}</div>
+          <div class="cfg-errors">{{ form.bairro.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.cidade.id_for_label }}">Cidade</label>
+          <div class="cfg-control">{{ form.cidade }}</div>
+          <div class="cfg-errors">{{ form.cidade.errors }}</div>
+        </div>
+
+        <div class="cfg-field">
+          <label class="cfg-label" for="{{ form.uf.id_for_label }}">UF</label>
+          <div class="cfg-control">{{ form.uf }}</div>
+          <div class="cfg-errors">{{ form.uf.errors }}</div>
+        </div>
+
+        <div class="cfg-field cfg-field--full">
+          <label class="cfg-label" for="{{ form.complemento.id_for_label }}">Complemento</label>
+          <div class="cfg-control">{{ form.complemento }}</div>
+          <div class="cfg-errors">{{ form.complemento.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- OBSERVAÇÕES               -->
+    <!-- ========================= -->
+    <section class="cfg-section">
+      <header class="cfg-section__header">
+        <h2 class="cfg-section__title">Observações</h2>
+      </header>
+
+      <div class="cfg-grid">
+        <div class="cfg-field cfg-field--full">
+          <label class="cfg-label" for="{{ form.observacao.id_for_label }}">Observação</label>
+          <div class="cfg-control">{{ form.observacao }}</div>
+          <div class="cfg-errors">{{ form.observacao.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AÇÕES -->
+    <div class="cfg-actions">
+      <button type="submit" class="btn btn-primary">Salvar contato</button>
+      <a href="{% url 'core:contatos_list' %}" class="btn btn-outline">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'js/contato.js' %}"></script>
 {% endblock %}
